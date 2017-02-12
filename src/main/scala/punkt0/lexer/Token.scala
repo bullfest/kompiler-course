@@ -1,52 +1,66 @@
 package punkt0
 package lexer
 
-sealed class Token extends Positioned
+sealed class Token(val kind: TokenKind) extends Positioned {
+  override def toString: String = kind.toString
+}
 
-case object BAD extends Token         // invalid token
-case object EOF extends Token
-case object COLON extends Token       // :
-case object SEMICOLON extends Token   // ;
-case object DOT extends Token         // .
-case object COMMA extends Token       // ,
-case object EQSIGN extends Token      // =
-case object EQUALS extends Token      // ==
-case object BANG extends Token        // !
-case object LPAREN extends Token      // (
-case object RPAREN extends Token      // )
-case object LBRACE extends Token      // {
-case object RBRACE extends Token      // }
-case object AND extends Token         // &&
-case object OR extends Token          // ||
-case object LESSTHAN extends Token    // <
-case object PLUS extends Token        // +
-case object MINUS extends Token       // -
-case object TIMES extends Token       // *
-case object DIV extends Token         // /
-case object OBJECT extends Token      // object
-case object CLASS extends Token       // class
-case object DEF extends Token         // def
-case object VAR extends Token         // var
-case object UNIT extends Token        // Unit
-case object STRING extends Token      // String
-case object EXTENDS extends Token     // extends
-case object INT extends Token         // Int
-case object BOOLEAN extends Token     // Boolean
-case object WHILE extends Token       // while
-case object IF extends Token          // if
-case object ELSE extends Token        // else
-case object LENGTH extends Token      // length
-case object TRUE extends Token        // true
-case object FALSE extends Token       // false
-case object THIS extends Token        // this
-case object NEW extends Token         // new
-case object PRINTLN extends Token     // println
+sealed trait TokenKind
 
-// Identifiers
-case class ID(value: String) extends Token
+case object STRLITKIND extends TokenKind
+case object INTLITKIND extends TokenKind
+case object IDKIND extends TokenKind
 
-// Integer literals
-case class INTLIT(value: Int) extends Token
+case object BAD extends TokenKind         // invalid token
+case object EOF extends TokenKind
+case object COLON extends TokenKind       // :
+case object SEMICOLON extends TokenKind   // ;
+case object DOT extends TokenKind         // .
+case object COMMA extends TokenKind       // ,
+case object EQSIGN extends TokenKind      // =
+case object EQUALS extends TokenKind      // ==
+case object BANG extends TokenKind        // !
+case object LPAREN extends TokenKind      // (
+case object RPAREN extends TokenKind      // )
+case object LBRACE extends TokenKind      // {
+case object RBRACE extends TokenKind      // }
+case object AND extends TokenKind         // &&
+case object OR extends TokenKind          // ||
+case object LESSTHAN extends TokenKind    // <
+case object PLUS extends TokenKind        // +
+case object MINUS extends TokenKind       // -
+case object TIMES extends TokenKind       // *
+case object DIV extends TokenKind         // /
+case object OBJECT extends TokenKind      // object
+case object CLASS extends TokenKind       // class
+case object DEF extends TokenKind         // def
+case object VAR extends TokenKind         // var
+case object UNIT extends TokenKind        // Unit
+case object STRING extends TokenKind      // String
+case object EXTENDS extends TokenKind     // extends
+case object INT extends TokenKind         // Int
+case object BOOLEAN extends TokenKind     // Boolean
+case object WHILE extends TokenKind       // while
+case object IF extends TokenKind          // if
+case object ELSE extends TokenKind        // else
+case object LENGTH extends TokenKind      // length
+case object TRUE extends TokenKind        // true
+case object FALSE extends TokenKind       // false
+case object THIS extends TokenKind        // this
+case object NEW extends TokenKind         // new
+case object PRINTLN extends TokenKind     // println
 
-// String literals
-case class STRLIT(value: String) extends Token
+// identifiers
+class ID(val value: String) extends Token(IDKIND) {
+  override def toString: String = "ID(" + value + ")"
+}
+
+// integer literals
+class INTLIT(val value: Int) extends Token(INTLITKIND) {
+  override def toString: String = "INT(" + value + ")"
+}
+
+// string literals
+class STRLIT(val value: String) extends Token(STRLITKIND) {
+  override def toString: String = "STR(" + value + ")"
+}

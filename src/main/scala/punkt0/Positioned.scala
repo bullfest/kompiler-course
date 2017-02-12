@@ -24,12 +24,14 @@ trait Positioned {
 
   def hasPos = info.isDefined
 
-  def setPos(file: File, pos: Int): Unit = {
+  def setPos(file: File, pos: Int): this.type = {
     info = Some((file, pos))
+    this
   }
 
-  def setPos(that: Positioned): Unit = {
+  def setPos(that: Positioned): this.type = {
     info = that.info
+    this
   }
 
   def posString: String =
