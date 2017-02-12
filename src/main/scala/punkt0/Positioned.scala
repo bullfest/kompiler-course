@@ -36,3 +36,5 @@ trait Positioned {
     if (hasPos) file.getPath + ":" + line + ":" + column
     else "?:?"
 }
+
+object NoPosition extends Positioned
