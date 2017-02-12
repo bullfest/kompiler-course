@@ -14,8 +14,6 @@ case object EQUALS extends Token      // ==
 case object BANG extends Token        // !
 case object LPAREN extends Token      // (
 case object RPAREN extends Token      // )
-case object LBRACKET extends Token    // [
-case object RBRACKET extends Token    // ]
 case object LBRACE extends Token      // {
 case object RBRACE extends Token      // }
 case object AND extends Token         // &&
@@ -43,7 +41,6 @@ case object FALSE extends Token       // false
 case object THIS extends Token        // this
 case object NEW extends Token         // new
 case object PRINTLN extends Token     // println
-case object STROF extends Token       // strOf
 
 // Identifiers
 case class ID(value: String) extends Token
