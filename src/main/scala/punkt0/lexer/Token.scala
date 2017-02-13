@@ -34,6 +34,7 @@ case object DIV extends TokenKind         // /
 case object OBJECT extends TokenKind      // object
 case object CLASS extends TokenKind       // class
 case object DEF extends TokenKind         // def
+case object OVERRIDE extends TokenKind    // override
 case object VAR extends TokenKind         // var
 case object UNIT extends TokenKind        // Unit
 case object STRING extends TokenKind      // String
@@ -47,6 +48,7 @@ case object LENGTH extends TokenKind      // length
 case object TRUE extends TokenKind        // true
 case object FALSE extends TokenKind       // false
 case object THIS extends TokenKind        // this
+case object NULL extends TokenKind        // null
 case object NEW extends TokenKind         // new
 case object PRINTLN extends TokenKind     // println
 
