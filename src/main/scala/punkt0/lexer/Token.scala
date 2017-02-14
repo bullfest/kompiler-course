@@ -44,7 +44,6 @@ case object BOOLEAN extends TokenKind     // Boolean
 case object WHILE extends TokenKind       // while
 case object IF extends TokenKind          // if
 case object ELSE extends TokenKind        // else
-case object LENGTH extends TokenKind      // length
 case object TRUE extends TokenKind        // true
 case object FALSE extends TokenKind       // false
 case object THIS extends TokenKind        // this
