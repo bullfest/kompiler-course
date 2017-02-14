@@ -11,9 +11,9 @@ specifications for the token classes `<IDENTIFIER>`,
 `<INTEGER_LITERAL>`, `<STRING_LITERAL>`, and `<EOF>`. Here are some
 details you should pay attention to:
 
-* Make sure you recognize keywords as their own token type. ''while'',
-  for instance, should be lexed as the token type ''WHILE'', not as an
-  identifier representing an object called "while".
+* Make sure you recognize keywords as their own token type. The
+  keyword `while`, for instance, should be lexed as the token type
+  `WHILE`, not as an identifier representing an object called `while`.
 
 * Make sure you correctly register the position of all tokens. Note
   the `Source.pos` and the `Positioned.setPos` methods.
@@ -24,7 +24,7 @@ details you should pay attention to:
   skip it, and keep on lexing the rest of the input. After lexing, the
   compiler still won't proceed to the next phase, but this helps the
   user correct more than one error per compilation. Use the special
-  ''BAD'' token type to mark errors and keep lexing as long as it is
+  `BAD` token type to mark errors and keep lexing as long as it is
   possible.
 
 * The Lexer does not immediately read and return all tokens, it
@@ -42,10 +42,14 @@ details you should pay attention to:
   compiler should output one token per line. After all tokens have
   been recognized, your compiler should exit.
 
+* Your compiler should terminate with exit code `1` in case the lexer
+  detected errors. See method `Reporter.terminateIfErrors`.
+
 ## Code stubs
 
 We provide code stubs for your project. Your task is to complete the
-file ''Lexer.scala'' and to implement the above `--tokens` option.
+file `Lexer.scala` and to implement the above `--tokens` option in
+`Main.scala`.
 
 | Non-terminal        |     | Definition                                                                                                                                                                                    |
 | ------------------- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
