@@ -5,7 +5,7 @@ object Trees {
   sealed trait Tree extends Positioned
 
   case class Program(main: MainMethod, classes: List[ClassDecl]) extends Tree
-  case class MainMethod(main: MethodDecl) extends Tree {
+  case class MainMethod(obj: Identifier, parent: Identifier, main: MethodDecl) extends Tree {
     val id = Identifier("Main")
     def exprs: List[ExprTree] = main.exprs ::: (main.retExpr :: Nil)
   }
