@@ -51,9 +51,9 @@ class OptChange {
 		i = 0;
 		while(i < coins.size()){
 			if(values.apply(i) == 1){
-				println(values.apply(i)+" coin/bill of "+coins(i)+".-")
+				println(values.apply(i)+" coin/bill of "+coins.apply(i)+".-")
 			}else{
-				println(values.apply(i)+" coins/bills of "+coins(i)+".-")
+				println(values.apply(i)+" coins/bills of "+coins.apply(i)+".-")
 			};
 			i = i + 1
 		};
