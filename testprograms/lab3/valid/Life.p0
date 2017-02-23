@@ -19,7 +19,7 @@ class Cons extends Arr {
 
 // NOTE: In the code that follows, there are spurious variables named
 // 'bitbucket'. They may or may not be needed due to syntax requirements
-// of SLAC. :)
+// of Punkt0. :)
 
 class Matrix {
   // We implement a matrix of integers using a single, unfolded array
