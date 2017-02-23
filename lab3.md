@@ -23,49 +23,54 @@ before you submit it.
 
 * Write a recursive-descent Parser for [punkt0](lab2.html) by manually
   writing mutually recursive procedures, as sketched in the lecture on
-  recursive descent parsing, and generating the appropriate Abstract
-  Syntax Trees.
-* Your compiler must support a command-line option ''--ast'' for
-  printing out the AST.
+  recursive descent parsing, and generating the appropriate abstract
+  syntax trees.
+
+* Implement a new command-line option `--ast` for printing out the
+  AST.
 
 ### Notes
 
   * It's not allowed in punkt0 to have a variable with a name that
     matches a keyword.
+
   * You need to properly encode the operator precedence as in Java and
-    Scala. From highest priority to lowest: **!**, then **'*'** and **/**,
-    then **+** and **-**, then **<** and **==**, then **&&**, then **||**.
-    Except for the unary operators, all operators are left-associative.
-    There is no precedence between operators of the same level. For
-    instance: 4 / 3 * 6 reads as ((4 / 3) * 6) and 6 * 4 / 3 as ((6 * 4) / 3.
+    Scala. From highest priority to lowest: **!**, then **'*'** and
+    **/**, then **+** and **-**, then **<** and **==**, then **&&**,
+    then **||**.  Except for the unary operators, all operators are
+    left-associative.  There is no precedence between operators of the
+    same level. For instance: `4 / 3 * 6` reads as `((4 / 3) * 6)` and
+    `6 * 4 / 3` as `((6 * 4) / 3`.
+
   * An `else` keyword always applies to the closest `if`. You can add
     comments to mark the end of `if` blocks in your pretty-printer to
     make sure you parse things properly.
 <code java>
-if (expr1) if (expr2) a=1 else a=2
+if (expr1) if (expr2) a = 1 else a = 2
 </code>
 ...could be reprinted as:
 <code java>
-if (expr1) { if (expr2) { a=1 } else { a=2 } }
+if (expr1) { if (expr2) { a = 1 } else { a = 2 } }
 </code>
 ...and should **not** produce:
 <code java>
-if (expr1) { if (expr2) { a=1 } } else { a=2 }
+if (expr1) { if (expr2) { a = 1 } } else { a = 2 }
 </code>
 
   * You have to write the parser manually, as a series of mutually
     recursive functions. You are not allowed to use parser combinators
     or other such libraries.
-  * You need to set the position of the trees. Normally, the position of
-    the tree corresponding to `42 + 23` is the position of the `4`.
-  * **Update:** we provide an
-    <a href="testprograms_public.zip">archive with test programs</a>
-    which you can use to test both your lexer and your parser (the
-    archive contains subdirectories "lab2" and "lab3").
-  * **Update:** the above archive with test programs has
-    been **updated** to also include the reference output for each test
-    program (tokens for each valid lexer test, AST for each valid parser
-    test).
+
+  * You need to set the position of the trees. Normally, the position
+    of the tree corresponding to `42 + 23` is the position of the `4`.
+
+  * We provide a number of both valid and invalid test programs which
+    you can use to test both your lexer and your parser (there are
+    subdirectories "lab2" and "lab3").
+
+  * The provided test programs also include the reference output for
+    each test program (tokens for each valid lexer test, AST for each
+    valid parser test).
 
 ## Pretty-printer
 
@@ -78,20 +83,11 @@ removed), as long as the program keeps the original intended
 meaning. Re-parsing the pretty-printed output and re-printing it
 should yield an identical result, though.
 
-* Your compiler must support a command-line option ''--print'' for
-  pretty-printing the AST of a program.
+* Implement a new command-line option `--print` for pretty-printing
+  the AST of a program.
 
 
 ## Stubs
 
 We provide <a href="parser-stubs.zip">code stubs</a> for your parser
-component. The ZIP archive contains all files of the lexer stubs, plus
-the following new or changed files:
-
-  * **ast/Parser.scala** contains a stub for the LL parser.
-  * **ast/Printer.scala** contains a stub for the pretty-printer. Note
-    that applying the printer to a tree returns a string and prints out
-    no output directly.
-  * **ast/Trees.scala** contains the AST classes.
-  * **Main.scala** contains the updated pipeline construction.
-
+component. The ZIP archive also contains all files of the lexer stubs.
