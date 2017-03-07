@@ -89,5 +89,5 @@ should yield an identical result, though.
 
 ## Stubs
 
-We provide <a href="parser-stubs.zip">code stubs</a> for your parser
+We provide <a href="parser-stubs-v2.zip">code stubs</a> for your parser
 component. The ZIP archive also contains all files of the lexer stubs.
