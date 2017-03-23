@@ -239,5 +239,6 @@ All other types of shadowing are not allowed in Punkt0.
 ## Stubs
 
 We provide [code stubs](namer-stubs.zip) for your name analyzer
-component. The ZIP archive also contains all files of the parser
-stubs.
+component (note that file `ast/Trees.scala` has been updated to
+include symbol information). The ZIP archive also contains all files
+of the parser stubs.
