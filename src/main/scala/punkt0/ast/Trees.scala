@@ -1,6 +1,8 @@
 package punkt0
 package ast
 
+import analyzer.Symbols._
+
 object Trees {
   val indent_length = 2
   sealed trait Tree extends Positioned {
@@ -15,7 +17,7 @@ object Trees {
     }
   }
 
-  case class MainDecl(obj: Identifier, parent: Identifier, vars: List[VarDecl], exprs: List[ExprTree]) extends Tree {
+  case class MainDecl(obj: Identifier, parent: Identifier, vars: List[VarDecl], exprs: List[ExprTree]) extends Tree  with Symbolic[ClassSymbol] {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
       sb.append(" "*indent).append("object ").append(obj.value).append(" extends ").append(parent.value).append(" {\n")
       val indent2 = indent + 2
@@ -38,7 +40,7 @@ object Trees {
     }
   }
 
-  case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree {
+  case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree with Symbolic[ClassSymbol] {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
       sb.append(" "*indent).append("class ").append(id.value)
       parent match {
@@ -60,7 +62,8 @@ object Trees {
       sb.append(" "*indent).append("}")
     }
   }
-  case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree {
+
+  case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree  with Symbolic[VariableSymbol]{
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
       sb.append("var ").append(id.value).append(": ")
       tpe.prettyPrint(sb, indent)
@@ -69,7 +72,8 @@ object Trees {
       sb.append(";")
     }
   }
-  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree  {
+
+  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree  with Symbolic[MethodSymbol]{
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
       if (overrides)
         sb.append("override ")
@@ -102,7 +106,8 @@ object Trees {
       sb.append(" "*indent).append("}")
     }
   }
-  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree {
+
+  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree with Symbolic[VariableSymbol] {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append(id.value).append(": ")
       tpe.prettyPrint(sb, indent)
@@ -135,6 +140,7 @@ object Trees {
 
 
   sealed trait ExprTree extends Tree
+  
   case class And(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       lhs.prettyPrint(sb, indent)
@@ -231,11 +237,11 @@ object Trees {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
       sb.append("false")
   }
-  case class Identifier(value: String) extends TypeTree with ExprTree {
+  case class Identifier(value: String) extends TypeTree with ExprTree with Symbolic[Symbol] {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
       sb.append(value)
   }
-  case class This() extends ExprTree {
+  case class This() extends ExprTree with Symbolic[ClassSymbol] {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
       sb.append("this")
   }
