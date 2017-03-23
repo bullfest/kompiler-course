@@ -64,6 +64,7 @@ object NameAnalysis extends Phase[Program, Program] {
     // (Step 3:) Print tree with symbol ids for debugging
 
     // Make sure you check all constraints
+
     Reporter.terminateIfErrors()
     prog
   }
