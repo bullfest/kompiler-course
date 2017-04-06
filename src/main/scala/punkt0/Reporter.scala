@@ -37,7 +37,7 @@ object Reporter {
     if (pos.hasPos) {
       err(s"${pos.posString}: $prefix: $msg")
       val lines = linesIn(pos.file)
-      if (pos.line <= lines.size && !lines.isEmpty) {
+      if (pos.line <= lines.size && pos.line > 0) {
         err(lines(pos.line - 1))
         err(" " * (pos.column - 1) + "^")
       } else {
