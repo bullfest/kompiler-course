@@ -1,8 +1,9 @@
 package punkt0
 package ast
 
-import punkt0.analyzer.NameAnalysis
-import punkt0.analyzer.Symbols._
+import analyzer.NameAnalysis
+import analyzer.Symbols._
+import analyzer.Types._
 
 object Trees {
   val indent_length = 2
@@ -26,9 +27,9 @@ object Trees {
     def attachSymbols(gs: GlobalScope, classScope: ClassSymbol = null, methodScope: MethodSymbol = null): Unit = Unit
   }
 
-  sealed trait TypeTree extends Tree
+  sealed trait TypeTree extends Tree with Typed
 
-  sealed trait ExprTree extends Tree
+  sealed trait ExprTree extends Tree with Typed
 
   abstract sealed class BinaryOperator(lhs: ExprTree, rhs: ExprTree, operator: String) extends ExprTree {
 
@@ -462,6 +463,19 @@ object Trees {
       // throw real error with stacktrace
       sys.error("Bad scope")
     }
+
+    // The type of the identifier depends on the type of the symbol
+    override def getType: Type = getSymbol match {
+      case cs: ClassSymbol =>
+        TAnyRef(cs)
+
+      case ms: MethodSymbol =>
+        sys.error("Requesting type of a method identifier.")
+
+      case vs: VariableSymbol =>
+        vs.getType
+    }
+    override def setType(tpe: Type) = this
   }
 
   case class This() extends ExprTree with Symbolic[ClassSymbol] {
