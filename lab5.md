@@ -1,6 +1,6 @@
 # Lab 5: Type Checking
 
-In this lab you will implement type checking in your SLAC
+In this lab you will implement type checking in your Punkt0
 compiler. After this step, you will have completed the front-end of
 your compiler. This means that it will be able to reject *all* invalid
 programs, and accept *all* valid programs. You will then be able to
@@ -14,9 +14,9 @@ just like "javac" and "scalac" do.
 
 ## Type checking
 
-A valid SLAC program has the following properties:
+A valid Punkt0 program has the following properties:
 
-* It follows the SLAC concrete syntax.
+* It follows the Punkt0 concrete syntax.
 * It respects all the constraints mentioned in [Lab 4](lab4.html).
 * Method overriding respects some typing constraints:
   * The overriding method must have exactly as many parameters as the overridden one.
@@ -28,20 +28,19 @@ Your goal in this assignment is to enforce all the constraints not
 enforced already by the previous phases.
 
 **Note:** The language and the type rules presented in the course may
-differ from the rules of SLAC. If there are any differences, please
+differ from the rules of Punkt0. If there are any differences, please
 use the description on the current page for your implementation, and
 not the rules in the lecture. Of course, feel free to clarify with
 us if you have any questions.
 
 ## Types
 
-The following primitive types exist in SLAC (note that we prefix them
+The following primitive types exist in Punkt0 (note that we prefix them
 with **T** to differentiate them from the tree nodes with the same
 name, for instance):
 
-  * **TInt**
   * **TBoolean**
-  * **TInt[]**
+  * **TInt**
   * **TString** (We consider **String** to be a primitive type, unlike in Java where it is a proper class. No methods can be called on **String**s, for instance.)
   * **TUnit**
 
@@ -54,10 +53,10 @@ subtypes of themselves and of no other type. For instance:
 
   * **TInt <: TInt**
 
-All class types are subtypes of themselves and the special "Object"
+All class types are subtypes of themselves and the special `AnyRef`
 class type. The subtyping relation is also transitive.
 
-  * **TClass[*name*] <: TClass[*name*]** and **TClass[*name*] <: TClass[**Object**]**
+  * **TClass[*name*] <: TClass[*name*]** and **TClass[*name*] <: TClass[**AnyRef**]**
   * **TClass[**B**] <: TClass[**A**]** and **TClass[**C**] <: TClass[**B**]** implies **TClass[**C**] <: TClass[**A**]**
 
 With this in mind, we give some of the non-trivial typing
@@ -66,9 +65,9 @@ should implement, but we expect you to be able to deduce the other
 rules unambiguously yourself (if in doubt about a rule, ask on KTH
 Social).
 
-### Overloaded "+"
+### Overloaded `+`
 
-The "+" operator can represent integer addition, or string
+The `+` operator can represent integer addition, or string
 concatenation. If the types of **e**1 and **e**2 are **T**1 and **T**2
 respectively, we have for the type **T**s of **e**1 + **e**2:
 
@@ -81,22 +80,21 @@ All other values for **T**1 and **T**2 should result in type errors.
 
 ### Comparison operator
 
-The "==" operator is also overloaded. Expression `e1 == e2` is type
+The `==` operator is also overloaded. Expression `e1 == e2` is type
 correct if and only if one of the following two cases applies:
 
   * `e1` and `e2` have both primitive types, and these types are equal
   * `e1` and `e2` have both class types (in which case they can be different classes)
 
 Note that it is **not** type correct to compare a primitive type to a
-class type. Note that strings and arrays of integers are considered
-**primitive**!
+class type. Again, strings are considered **primitive**.
 
 Consider the following code.
 
     class A {}
     class B {}
 
-Let e1:T1 and e2:T2. Then the following table summarizes some of the cases for `e1 == e2`.
+Let `e1: T1` and `e2: T2`. Then the following table summarizes some of the cases for `e1 == e2`.
 
 T1     | T2     | type checks?
 --     | --     | ------------
@@ -105,8 +103,6 @@ String | String | yes
 String | A      | no
 A      | Int    | no
 A      | B      | yes
-A      | Int[]  | no
-Int    | Int[]  | no
 
 ### Method calls
 
@@ -120,17 +116,12 @@ subtypes of the declared parameters (matching one-by-one).
 Assignment of an expression of type **T** can only be done to a
 variable of type **S** such that **T <: S**.
 
-Assignment to array elements can only be done through an array
-variable, and the index must be an integer expression. The assigned
-value must be an integer.
-
-The type of an assignment expression (including array assignment) is
-**Unit**.
+The type of an assignment expression is **Unit**.
 
 
-### Self
+### This
 
-**self** is always considered to carry the class type corresponding to
+`this` is always considered to carry the class type corresponding to
 the class where it occurs.
 
 
@@ -140,30 +131,23 @@ The returned expression must be of a subtype of the declared return
 type.
 
 
-### The println expression
+### The `println` expression
 
-We will consider **println** calls to be type correct if the argument
-is a string. The type of a **println** expression is **Unit**.
-
-
-### The strOf expression
-
-We will consider **strOf** expressions to be type correct if the
-argument is either an integer or a Boolean. The type
-of a **strOf** expression is **String**. If you want to accept
-**strOf** expressions that convert objects or arrays to strings you
-are free to do it, but please let us know in a README file. 
+We will consider `println` calls to be type correct if the argument is
+a string. The type of a `println` expression is **Unit**.
 
 
-### The while expression
+### The `while` expression
 
-The type of a **while** expression is **Unit**. Its conditional expression must have type **Bool**, and its body must have type **Unit**.
+The type of a **while** expression is **Unit**. Its conditional
+expression must have type **Boolean**, and its body must have type
+**Unit**.
 
 
-### The main method
+### The main declaration
 
-The main method is not allowed to take any arguments. Its return type
-must be **Unit**.
+The main `object` declaration must extend the built-in `App`
+type. (This is important to ensure Punkt0 is a subset of Scala.)
 
 
 ## Suggested implementation
@@ -192,16 +176,11 @@ Here are the steps we suggest you take:
 ## User-friendliness
 
 It is very important that your compiler does not stop at the first
-type error! **TypeChecker.scala** contains some hints on how to
-achieve this. Detect as many errors as possible!
+type error! `TypeChecker.scala` contains some hints on how to achieve
+this. Detect as many errors as possible!
 
 ## Stubs
 
 We provide [code stubs](typer-stubs.zip) for your type checker
-component. The ZIP archive contains all files of the previous stubs,
-plus the following new or changed files:
-
-  * **analyzer/Symbols.scala** (updated) contains an updated version of symbols with types.
-  * **analyzer/TypeChecking.scala** (new) contains a stub for the type checker.
-  * **analyzer/Types.scala** (new) contains a stub for the types.
-  * **ast/Trees.scala** (updated) contains an updated version of trees with symbols and types.
+component. The ZIP archive also includes all files of the previous
+stubs.
