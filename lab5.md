@@ -7,11 +7,6 @@ programs, and accept *all* valid programs. You will then be able to
 turn these valid programs into assembly code that runs on the JVM,
 just like "javac" and "scalac" do.
 
-**Update 2 may 2016:** we provide an <a
-  href="testprograms_public_typer.zip">archive with test programs</a>
-  which you can use to test your type checker (the archive contains a
-  subdirectory "lab5").
-
 ## Type checking
 
 A valid Punkt0 program has the following properties:
