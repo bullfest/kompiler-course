@@ -17,6 +17,7 @@ A valid Punkt0 program has the following properties:
   * The overriding method must have exactly as many parameters as the overridden one.
   * The types of the parameters in the overriding and overridden methods must match exactly (no contravariance allowed).
   * The return type must match exactly (no covariance allowed).
+  * The overriding method must carry the `override` modifier.
 * All expressions typecheck and have the expected type (the returned expression matches the declared return type, for instance).
 
 Your goal in this assignment is to enforce all the constraints not
@@ -48,7 +49,7 @@ subtypes of themselves and of no other type. For instance:
 
   * **TInt <: TInt**
 
-All class types are subtypes of themselves and the special `AnyRef`
+All class types are subtypes of themselves and the special **AnyRef**
 class type. The subtyping relation is also transitive.
 
   * **TClass[*name*] <: TClass[*name*]** and **TClass[*name*] <: TClass[**AnyRef**]**
@@ -102,7 +103,7 @@ A      | B      | yes
 ### Method calls
 
 The dereferenced object must be of a class type, and its class must
-declare the called method. The number of arguments must of course
+declare or inherit the called method. The number of arguments must of course
 match the number of parameters. The passed arguments must have
 subtypes of the declared parameters (matching one-by-one).
 
@@ -113,6 +114,7 @@ variable of type **S** such that **T <: S**.
 
 The type of an assignment expression is **Unit**.
 
+It is not allowed to reassign method parameters.
 
 ### This
 
@@ -128,8 +130,7 @@ type.
 
 ### The `println` expression
 
-We will consider `println` calls to be type correct if the argument is
-a string. The type of a `println` expression is **Unit**.
+We will consider `println` calls to be type correct if the argument has type **String**, **Int**, or **Boolean**. The type of a `println` expression is **Unit**.
 
 
 ### The `while` expression
@@ -139,11 +140,23 @@ expression must have type **Boolean**, and its body must have type
 **Unit**.
 
 
+### The `if` expression
+
+The type of an `if` expression is the least upper bound of the types of the two branches. Its conditional expression must have type **Boolean**.
+
+### The block expression
+
+The type of a block expression is the type of the block's last expression.
+
 ### The main declaration
 
 The main `object` declaration must extend the built-in `App`
 type. (This is important to ensure Punkt0 is a subset of Scala.)
 
+
+### Variable declarations
+
+The constant initial expression must be of the correct, declared type.
 
 ## Suggested implementation
 
