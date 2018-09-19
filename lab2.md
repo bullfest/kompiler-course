@@ -45,11 +45,6 @@ details you should pay attention to:
 * Your compiler should terminate with exit code `1` in case the lexer
   detected errors. See method `Reporter.terminateIfErrors`.
 
-* **Update 28 Feb 2017:** The grammar of Punkt0 has been updated. The
-  definition of non-terminal *MainDeclaration* has been changed (a) to
-  ensure Punkt0 is a valid subset of Scala, and (b) to permit local
-  variable declarations. No new tokens have been introduced, however.
-
 ## Code stubs
 
 We provide code stubs for your project. Your task is to complete the
