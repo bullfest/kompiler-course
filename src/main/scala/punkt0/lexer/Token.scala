@@ -2,7 +2,7 @@ package punkt0
 package lexer
 
 sealed class Token(val kind: TokenKind) extends Positioned {
-  override def toString: String = kind.toString
+  override def toString: String = kind.toString + (if (kind == EOF) "()" else this.posString)
 }
 
 sealed trait TokenKind
@@ -53,15 +53,15 @@ case object PRINTLN extends TokenKind     // println
 
 // identifiers
 class ID(val value: String) extends Token(IDKIND) {
-  override def toString: String = "ID(" + value + ")"
+  override def toString: String = "ID(" + value + ")" + this.posString
 }
 
 // integer literals
 class INTLIT(val value: Int) extends Token(INTLITKIND) {
-  override def toString: String = "INT(" + value + ")"
+  override def toString: String = "INT(" + value + ")" + this.posString
 }
 
 // string literals
 class STRLIT(val value: String) extends Token(STRLITKIND) {
-  override def toString: String = "STR(" + value + ")"
+  override def toString: String = "STR(" + value + ")" + this.posString
 }
