@@ -50,6 +50,8 @@ case object THIS extends TokenKind        // this
 case object NULL extends TokenKind        // null
 case object NEW extends TokenKind         // new
 case object PRINTLN extends TokenKind     // println
+case object COMMENT extends TokenKind     // //, /* */
+case object WHITESPACE extends TokenKind  // \s+
 
 // identifiers
 class ID(val value: String) extends Token(IDKIND) {

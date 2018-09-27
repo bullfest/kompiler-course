@@ -46,7 +46,10 @@ object Main {
   def main(args: Array[String]): Unit = {
     val ctx = processOptions(args)
 
-    // TODO: run lexer phase
+    val tokens = Lexer.run(ctx.file.get)(ctx)
+    for (token <- tokens) {
+      println(token)
+    }
+    Reporter.terminateIfErrors()
   }
-
 }

@@ -11,19 +11,25 @@ sealed abstract class TokenMatcher(tokenKind: TokenKind, literalString: String =
 
   def getTokenKind: TokenKind = tokenKind
 
-  def token = new Token(tokenKind)
+  def token(value: String): Token =
+    tokenKind match {
+      case IDKIND => new ID(value)
+      case INTLITKIND => new INTLIT(value.toInt)
+      case STRLITKIND => new STRLIT(value)
+      case _ => new Token(tokenKind)
+    }
 
   def matchingPrefixLength(s: String): Int =
     if (literalString != null)
       commonPrefixLength(s, literalString)
     else if (matchRegex != null)
       regex.findPrefixMatchOf(s) match {
-        case Some(prefix) => prefix.matched.length
+        case Some(prefix) =>
+          prefix.matched.length
         case None => 0
       }
     else
       throw new IllegalStateException("TokenMatcher has to have a literalString or matchRegex")
-
 
   private def commonPrefixLength(s: String, t: String): Int = {
     var i = 0
@@ -41,6 +47,16 @@ sealed abstract class TokenMatcher(tokenKind: TokenKind, literalString: String =
       throw new IllegalStateException("TokenMatcher has to have a literalString or matchRegex")
   }
 }
+
+abstract class BadMatcher extends TokenMatcher(BAD, "") {
+  override def matchingPrefixLength(s: String): Int =
+    if (s.startsWith("/*") && !s.contains("*/")) 2
+    else 0
+
+  override def matches(s: String): Boolean = false
+}
+
+case object BAD_MATCHER extends BadMatcher
 
 case object COLON_MATCHER extends TokenMatcher(COLON, ":")
 
@@ -116,11 +132,21 @@ case object NEW_MATCHER extends TokenMatcher(NEW, "new")
 
 case object PRINTLN_MATCHER extends TokenMatcher(PRINTLN, "println")
 
+case object COMMENT_MATCHER extends TokenMatcher(COMMENT, matchRegex = "//.*\n|/\\*(?s).*?\\*/")
+
+case object WHITESPACE_MATCHER extends TokenMatcher(WHITESPACE, matchRegex = "\\s+")
+
+case object ID_MATCHER extends TokenMatcher(IDKIND, matchRegex = "[A-Za-z][A-Za-z_0-9]*")
+
+case object INTLIT_MATCHER extends TokenMatcher(INTLITKIND, matchRegex = "[1-9][0-9]*(?![A-Za-z_])")
+
+case object STRLIT_MATCHER extends TokenMatcher(STRLITKIND, matchRegex = "\"[^\n\"]*?\"")
 
 object TOKEN_MATCHERS {
 
   // Order here is important, earlier means that it has a higher priority
   val asList: List[TokenMatcher] = List(
+    BAD_MATCHER,
     COLON_MATCHER,
     SEMICOLON_MATCHER,
     DOT_MATCHER,
@@ -158,5 +184,10 @@ object TOKEN_MATCHERS {
     NULL_MATCHER,
     NEW_MATCHER,
     PRINTLN_MATCHER,
+    ID_MATCHER,
+    INTLIT_MATCHER,
+    STRLIT_MATCHER,
+    COMMENT_MATCHER,
+    WHITESPACE_MATCHER,
   )
 }
