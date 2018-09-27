@@ -42,17 +42,17 @@ sealed abstract class TokenMatcher(tokenKind: TokenKind, literalString: String =
   }
 }
 
-case object COLON_MATCHER extends TokenMatcher(COLON,":")
+case object COLON_MATCHER extends TokenMatcher(COLON, ":")
 
-case object SEMICOLON_MATCHER extends TokenMatcher(SEMICOLON,";")
+case object SEMICOLON_MATCHER extends TokenMatcher(SEMICOLON, ";")
 
-case object DOT_MATCHER extends TokenMatcher(DOT,".")
+case object DOT_MATCHER extends TokenMatcher(DOT, ".")
 
-case object COMMA_MATCHER extends TokenMatcher(COMMA,",")
+case object COMMA_MATCHER extends TokenMatcher(COMMA, ",")
 
-case object EQSIGN_MATCHER extends TokenMatcher(EQSIGN,"=")
+case object EQSIGN_MATCHER extends TokenMatcher(EQSIGN, "=")
 
-case object EQUALS_MATCHER extends TokenMatcher(EQUALS,"==")
+case object EQUALS_MATCHER extends TokenMatcher(EQUALS, "==")
 
 case object BANG_MATCHER extends TokenMatcher(BANG, "!")
 
@@ -60,15 +60,15 @@ case object LPAREN_MATCHER extends TokenMatcher(LPAREN, "(")
 
 case object RPAREN_MATCHER extends TokenMatcher(RPAREN, ")")
 
-case object LBRACE_MATCHER extends TokenMatcher(LBRACE,"{")
+case object LBRACE_MATCHER extends TokenMatcher(LBRACE, "{")
 
-case object RBRACE_MATCHER extends TokenMatcher(RBRACE,"}")
+case object RBRACE_MATCHER extends TokenMatcher(RBRACE, "}")
 
-case object AND_MATCHER extends TokenMatcher(AND,"&&")
+case object AND_MATCHER extends TokenMatcher(AND, "&&")
 
-case object OR_MATCHER extends TokenMatcher(OR,"||")
+case object OR_MATCHER extends TokenMatcher(OR, "||")
 
-case object LESSTHAN_MATCHER extends TokenMatcher(LESSTHAN,"<")
+case object LESSTHAN_MATCHER extends TokenMatcher(LESSTHAN, "<")
 
 case object PLUS_MATCHER extends TokenMatcher(PLUS, "+")
 
@@ -98,9 +98,9 @@ case object INT_MATCHER extends TokenMatcher(INT, "Int")
 
 case object BOOLEAN_MATCHER extends TokenMatcher(BOOLEAN, "Boolean")
 
-case object WHILE_MATCHER extends TokenMatcher(WHILE,"while")
+case object WHILE_MATCHER extends TokenMatcher(WHILE, "while")
 
-case object IF_MATCHER extends TokenMatcher(IF,"if")
+case object IF_MATCHER extends TokenMatcher(IF, "if")
 
 case object ELSE_MATCHER extends TokenMatcher(ELSE, "else")
 
