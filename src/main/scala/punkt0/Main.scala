@@ -3,6 +3,7 @@ package punkt0
 import java.io.File
 
 import lexer._
+import punkt0.ast.Parser
 
 
 object Main {
@@ -55,10 +56,8 @@ object Main {
   def main(args: Array[String]): Unit = {
     val ctx = processOptions(args)
 
-    val tokens = Lexer.run(ctx.file.get)(ctx)
-    for (token <- tokens) {
-      println(token)
-    }
+    val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
+    print(result)
     Reporter.terminateIfErrors()
   }
 }
