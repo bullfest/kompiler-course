@@ -68,7 +68,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       }
       eat(RBRACE)
 
-      ClassDecl(name, extends_, vars, methods)
+      ClassDecl(name, extends_, vars.reverse, methods.reverse)
     }
 
     def parseMain: MainDecl = {
