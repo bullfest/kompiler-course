@@ -19,6 +19,10 @@ object Main {
         ctx = ctx.copy(outDir = Some(new File(out)))
         processOption(args)
 
+      case "--tokens" :: args =>
+        ctx = ctx.copy(doTokens = true)
+        processOption(args)
+
       case f :: args =>
         ctx = ctx.copy(file = Some(new File(f)))
         processOption(args)
@@ -31,6 +35,11 @@ object Main {
     if (ctx.doHelp) {
       displayHelp()
       sys.exit(0)
+    }
+
+    if (ctx.doTokens) {
+      for (token <- Lexer.run(ctx.file.get)(ctx))
+        print(token)
     }
 
     ctx
