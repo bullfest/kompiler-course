@@ -81,10 +81,10 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR) {
         vars ::= parseVar
       }
-      var exprs: List[ExprTree] = List(parseExpressionWithOperators0)
+      var exprs: List[ExprTree] = List(parseExpression)
       while (currentToken.kind == SEMICOLON) {
         eat(SEMICOLON)
-        exprs ::= parseExpressionWithOperators0
+        exprs ::= parseExpression
       }
       eat(RBRACE)
       MainDecl(name, extends_, vars.reverse, exprs.reverse)
@@ -114,10 +114,10 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR)
         vars ::= parseVar
 
-        var exprs: List[ExprTree] = List(parseExpressionWithOperators0)
+        var exprs: List[ExprTree] = List(parseExpression)
         while (currentToken.kind == SEMICOLON) {
           eat(SEMICOLON)
-          exprs ::= parseExpressionWithOperators0
+          exprs ::= parseExpression
         }
         eat(RBRACE)
 
@@ -137,7 +137,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       eat(COLON)
       var type_ = parseType
       eat(EQSIGN)
-      var expr = parseExpressionWithOperators0
+      var expr = parseExpression
       eat(SEMICOLON)
       VarDecl(type_, id, expr)
     }
@@ -159,7 +159,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       }).setPos(thisToken)
     }
 
-    def parseExpression: ExprTree = {
+    def parseWeakExpression: ExprTree = {
       val thisToken = currentToken
       readToken
 
@@ -177,7 +177,7 @@ object Parser extends Phase[Iterator[Token], Program] {
             // ident == expr
             val identifier = parseIdentifier()
             eat(EQSIGN)
-            Assign(identifier, parseExpressionWithOperators0)
+            Assign(identifier, parseExpression)
           } else // ident
             parseIdentifier(thisToken)
         case THIS =>
@@ -189,39 +189,43 @@ object Parser extends Phase[Iterator[Token], Program] {
           eatTokenSequence(List(LPAREN, RPAREN))
           New(identifier)
         case BANG =>
-          Not(parseExpressionWithOperators0)
+          Not(parseExpression)
         case LPAREN =>
-          val exprTree = parseExpressionWithOperators0
+          val exprTree = parseExpression
           eat(RPAREN)
           exprTree
         case LBRACE =>
           var allIsWell = true
-          var exprList: List[ExprTree] = List(parseExpressionWithOperators0)
-          while (currentToken.kind != RPAREN)
-            exprList ::= parseExpressionWithOperators0
-            eat(RPAREN)
-            Block(exprList.reverse)
+          var exprList: List[ExprTree] = List(parseExpression)
+          while (currentToken.kind != RBRACE) {
+            eat(SEMICOLON)
+            exprList ::= parseExpression
+          }
+          eat(RBRACE)
+          Block(exprList.reverse)
         case IF =>
           eat(LPAREN)
-          val condExpr = parseExpressionWithOperators0
+          val condExpr = parseExpression
           eat(RPAREN)
-          val trueExpr = parseExpressionWithOperators0
-          if (currentToken.kind == ELSE)
-            If(condExpr, trueExpr, Some(parseExpressionWithOperators0))
-          else
+          val trueExpr = parseExpression
+          if (currentToken.kind == ELSE) {
+            eat(ELSE)
+            If(condExpr, trueExpr, Some(parseExpression))
+          } else {
             If(condExpr, trueExpr, None)
+          }
         case WHILE =>
           eat(LPAREN)
-          val condExpr = parseExpressionWithOperators0
+          val condExpr = parseExpression
           eat(RPAREN)
-          While(condExpr, parseExpressionWithOperators0)
+          While(condExpr, parseExpression)
         case PRINTLN =>
           eat(LPAREN)
-          val expr = parseExpressionWithOperators0
+          val expr = parseExpression
           eat(RPAREN)
           Println(expr)
         case _ =>
-          expected(INTLITKIND)
+          expected(INTLITKIND, STRLITKIND, TRUE, FALSE)
       }
 
       if (currentToken.kind == DOT) {
@@ -231,14 +235,13 @@ object Parser extends Phase[Iterator[Token], Program] {
         var args: List[ExprTree] = List()
         if (currentToken.kind != RPAREN) {
           do {
-            args = parseExpressionWithOperators0 :: args
+            args = parseExpression :: args
           } while (currentToken.kind == COMMA)
         }
         eat(RPAREN)
         tree = MethodCall(tree, method, args)
-      } else if (List(TIMES, DIV, MINUS, PLUS).contains(currentToken.kind)) {
-        //TODO: :'(
       }
+
       tree.setPos(thisToken)
     }
 
@@ -254,33 +257,66 @@ object Parser extends Phase[Iterator[Token], Program] {
       Identifier(token_.asInstanceOf[ID].value)
     }
 
-    def parseExpressionWithOperators0(): ExprTree = {
-      val expr = parseExpressionWithOperators1
-      val nextToken = tokens.next
-      if (nextToken.kind == TIMES) {
+    def parseExpression: ExprTree = {
+      val expr = parseStrongExpression1
+      if (currentToken.kind == TIMES) {
         eat(TIMES)
-        Times(expr, parseExpressionWithOperators1)
-      } else if (nextToken.kind == DIV) {
+        Times(expr, parseExpression)
+      } else if (currentToken.kind == DIV) {
         eat(DIV)
-        Div(expr, parseExpressionWithOperators1)
+        Div(expr, parseExpression)
       } else {
         expr
       }
     }
 
-    def parseExpressionWithOperators1(): ExprTree = {
-      val expr = parseExpression
-      val nextToken = tokens.next
-      if (nextToken.kind == PLUS) {
+    def parseStrongExpression1: ExprTree = {
+      val expr = parseStrongExpression2
+      if (currentToken.kind == PLUS) {
         eat(PLUS)
-        Plus(expr, parseExpression)
-      } else if (nextToken.kind == MINUS) {
+        Plus(expr, parseStrongExpression1)
+      } else if (currentToken.kind == MINUS) {
         eat(MINUS)
-        Minus(expr, parseExpression)
+        Minus(expr, parseStrongExpression1)
       } else {
         expr
       }
     }
+
+    def parseStrongExpression2: ExprTree = {
+      val expr = parseStrongExpression3
+      if (currentToken.kind == LESSTHAN) {
+        eat(LESSTHAN)
+        LessThan(expr, parseStrongExpression2)
+      } else if (currentToken.kind == EQUALS) {
+        eat(EQUALS)
+        Equals(expr, parseStrongExpression2)
+      } else {
+        expr
+      }
+    }
+
+    def parseStrongExpression3: ExprTree = {
+      val expr = parseStrongExpression4
+      if (currentToken.kind == AND) {
+        eat(AND)
+        And(expr, parseStrongExpression3)
+      } else {
+        expr
+      }
+    }
+
+    def parseStrongExpression4: ExprTree = {
+      val expr = parseWeakExpression
+      if (currentToken.kind == OR) {
+        eat(OR)
+        Or(expr, parseStrongExpression4)
+      } else {
+        expr
+      }
+    }
+
+
 
     readToken
     val tree = parseGoal
