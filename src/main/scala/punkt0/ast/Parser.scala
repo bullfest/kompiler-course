@@ -179,7 +179,7 @@ object Parser extends Phase[Iterator[Token], Program] {
             eat(EQSIGN)
             Assign(identifier, parseExpression)
           } else // ident
-            parseIdentifier(currentToken)
+            parseIdentifier(thisToken)
         case THIS =>
           This()
         case NULL =>
