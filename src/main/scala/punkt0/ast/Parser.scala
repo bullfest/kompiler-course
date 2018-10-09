@@ -109,6 +109,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       }
       eatTokenSequence(List(RPAREN, COLON))
       val retType = parseType
+      eatTokenSequence(List(EQSIGN, LBRACE))
       var vars: List[VarDecl] = List()
       while (currentToken.kind == VAR)
         vars ::= parseVar
@@ -118,14 +119,15 @@ object Parser extends Phase[Iterator[Token], Program] {
         eat(SEMICOLON)
         exprs ::= parseExpression
       }
+      eat(RBRACE)
 
       MethodDecl(overrides, retType, name, args.reverse, vars.reverse, exprs.tail.reverse, exprs.head)
     }
 
     def parseFormal: Formal = {
-      val type_ = parseType
-      eat(COLON)
       val id = parseIdentifier()
+      eat(COLON)
+      val type_ = parseType
       Formal(type_, id)
     }
 
@@ -218,7 +220,8 @@ object Parser extends Phase[Iterator[Token], Program] {
           val expr = parseExpression
           eat(RPAREN)
           Println(expr)
-
+        case _ =>
+          expected(INTLITKIND)
       }
 
       if (currentToken.kind == DOT) {

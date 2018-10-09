@@ -138,7 +138,7 @@ case object WHITESPACE_MATCHER extends TokenMatcher(WHITESPACE, matchRegex = "\\
 
 case object ID_MATCHER extends TokenMatcher(IDKIND, matchRegex = "[A-Za-z][A-Za-z_0-9]*")
 
-case object INTLIT_MATCHER extends TokenMatcher(INTLITKIND, matchRegex = "[1-9][0-9]*(?![A-Za-z_])")
+case object INTLIT_MATCHER extends TokenMatcher(INTLITKIND, matchRegex = "(0|[1-9][0-9]*)(?![A-Za-z_])")
 
 case object STRLIT_MATCHER extends TokenMatcher(STRLITKIND, matchRegex = "\"[^\n\"]*?\"")
 
