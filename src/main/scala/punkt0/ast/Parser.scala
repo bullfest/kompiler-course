@@ -81,10 +81,10 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR) {
         vars ::= parseVar
       }
-      var exprs: List[ExprTree] = List(parseExpression)
+      var exprs: List[ExprTree] = List(parseExpressionWithOperators0)
       while (currentToken.kind == SEMICOLON) {
         eat(SEMICOLON)
-        exprs ::= parseExpression
+        exprs ::= parseExpressionWithOperators0
       }
       eat(RBRACE)
       MainDecl(name, extends_, vars.reverse, exprs.reverse)
@@ -114,14 +114,14 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR)
         vars ::= parseVar
 
-      var exprs: List[ExprTree] = List(parseExpression)
-      while (currentToken.kind == SEMICOLON) {
-        eat(SEMICOLON)
-        exprs ::= parseExpression
-      }
-      eat(RBRACE)
+        var exprs: List[ExprTree] = List(parseExpressionWithOperators0)
+        while (currentToken.kind == SEMICOLON) {
+          eat(SEMICOLON)
+          exprs ::= parseExpressionWithOperators0
+        }
+        eat(RBRACE)
 
-      MethodDecl(overrides, retType, name, args.reverse, vars.reverse, exprs.tail.reverse, exprs.head)
+        MethodDecl(overrides, retType, name, args.reverse, vars.reverse, exprs.tail.reverse, exprs.head)
     }
 
     def parseFormal: Formal = {
@@ -137,7 +137,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       eat(COLON)
       var type_ = parseType
       eat(EQSIGN)
-      var expr = parseExpression
+      var expr = parseExpressionWithOperators0
       eat(SEMICOLON)
       VarDecl(type_, id, expr)
     }
@@ -177,7 +177,7 @@ object Parser extends Phase[Iterator[Token], Program] {
             // ident == expr
             val identifier = parseIdentifier()
             eat(EQSIGN)
-            Assign(identifier, parseExpression)
+            Assign(identifier, parseExpressionWithOperators0)
           } else // ident
             parseIdentifier(thisToken)
         case THIS =>
@@ -189,35 +189,35 @@ object Parser extends Phase[Iterator[Token], Program] {
           eatTokenSequence(List(LPAREN, RPAREN))
           New(identifier)
         case BANG =>
-          Not(parseExpression)
+          Not(parseExpressionWithOperators0)
         case LPAREN =>
-          val exprTree = parseExpression
+          val exprTree = parseExpressionWithOperators0
           eat(RPAREN)
           exprTree
         case LBRACE =>
           var allIsWell = true
-          var exprList: List[ExprTree] = List(parseExpression)
+          var exprList: List[ExprTree] = List(parseExpressionWithOperators0)
           while (currentToken.kind != RPAREN)
-            exprList ::= parseExpression
-          eat(RPAREN)
-          Block(exprList.reverse)
+            exprList ::= parseExpressionWithOperators0
+            eat(RPAREN)
+            Block(exprList.reverse)
         case IF =>
           eat(LPAREN)
-          val condExpr = parseExpression
+          val condExpr = parseExpressionWithOperators0
           eat(RPAREN)
-          val trueExpr = parseExpression
+          val trueExpr = parseExpressionWithOperators0
           if (currentToken.kind == ELSE)
-            If(condExpr, trueExpr, Some(parseExpression))
+            If(condExpr, trueExpr, Some(parseExpressionWithOperators0))
           else
             If(condExpr, trueExpr, None)
         case WHILE =>
           eat(LPAREN)
-          val condExpr = parseExpression
+          val condExpr = parseExpressionWithOperators0
           eat(RPAREN)
-          While(condExpr, parseExpression)
+          While(condExpr, parseExpressionWithOperators0)
         case PRINTLN =>
           eat(LPAREN)
-          val expr = parseExpression
+          val expr = parseExpressionWithOperators0
           eat(RPAREN)
           Println(expr)
         case _ =>
@@ -231,7 +231,7 @@ object Parser extends Phase[Iterator[Token], Program] {
         var args: List[ExprTree] = List()
         if (currentToken.kind != RPAREN) {
           do {
-            args = parseExpression :: args
+            args = parseExpressionWithOperators0 :: args
           } while (currentToken.kind == COMMA)
         }
         eat(RPAREN)
@@ -245,13 +245,41 @@ object Parser extends Phase[Iterator[Token], Program] {
     def eatTokenSequence(tokenKindList: List[TokenKind]): Unit =
       tokenKindList.map(eat)
 
-    def parseIdentifier(token:Token = null): Identifier = {
+    def parseIdentifier(token: Token = null): Identifier = {
       var token_ = token
       if (token == null) {
         token_ = currentToken
         eat(IDKIND)
       }
       Identifier(token_.asInstanceOf[ID].value)
+    }
+
+    def parseExpressionWithOperators0(): ExprTree = {
+      val expr = parseExpressionWithOperators1
+      val nextToken = tokens.next
+      if (nextToken.kind == TIMES) {
+        eat(TIMES)
+        Times(expr, parseExpressionWithOperators1)
+      } else if (nextToken.kind == DIV) {
+        eat(DIV)
+        Div(expr, parseExpressionWithOperators1)
+      } else {
+        expr
+      }
+    }
+
+    def parseExpressionWithOperators1(): ExprTree = {
+      val expr = parseExpression
+      val nextToken = tokens.next
+      if (nextToken.kind == PLUS) {
+        eat(PLUS)
+        Plus(expr, parseExpression)
+      } else if (nextToken.kind == MINUS) {
+        eat(MINUS)
+        Minus(expr, parseExpression)
+      } else {
+        expr
+      }
     }
 
     readToken
