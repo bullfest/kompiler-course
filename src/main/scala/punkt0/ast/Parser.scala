@@ -257,27 +257,27 @@ object Parser extends Phase[Iterator[Token], Program] {
       Identifier(token_.asInstanceOf[ID].value)
     }
 
-    def parseExpression: ExprTree = {
-      val expr = parseStrongExpression1
+    def parseStrongExpression4: ExprTree = {
+      val expr = parseWeakExpression
       if (currentToken.kind == TIMES) {
         eat(TIMES)
-        Times(expr, parseExpression)
+        Times(expr, parseStrongExpression4)
       } else if (currentToken.kind == DIV) {
         eat(DIV)
-        Div(expr, parseExpression)
+        Div(expr, parseStrongExpression4)
       } else {
         expr
       }
     }
 
-    def parseStrongExpression1: ExprTree = {
-      val expr = parseStrongExpression2
+    def parseStrongExpression3: ExprTree = {
+      val expr = parseStrongExpression4
       if (currentToken.kind == PLUS) {
         eat(PLUS)
-        Plus(expr, parseStrongExpression1)
+        Plus(expr, parseStrongExpression3)
       } else if (currentToken.kind == MINUS) {
         eat(MINUS)
-        Minus(expr, parseStrongExpression1)
+        Minus(expr, parseStrongExpression3)
       } else {
         expr
       }
@@ -296,21 +296,21 @@ object Parser extends Phase[Iterator[Token], Program] {
       }
     }
 
-    def parseStrongExpression3: ExprTree = {
-      val expr = parseStrongExpression4
+    def parseStrongExpression1: ExprTree = {
+      val expr = parseStrongExpression2
       if (currentToken.kind == AND) {
         eat(AND)
-        And(expr, parseStrongExpression3)
+        And(expr, parseStrongExpression1)
       } else {
         expr
       }
     }
 
-    def parseStrongExpression4: ExprTree = {
-      val expr = parseWeakExpression
+    def parseExpression: ExprTree = {
+      val expr = parseStrongExpression1
       if (currentToken.kind == OR) {
         eat(OR)
-        Or(expr, parseStrongExpression4)
+        Or(expr, parseExpression)
       } else {
         expr
       }
