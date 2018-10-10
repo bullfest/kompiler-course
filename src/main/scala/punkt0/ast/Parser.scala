@@ -211,10 +211,13 @@ object Parser extends Phase[Iterator[Token], Program] {
           exprTree
         case LBRACE =>
           eat(LBRACE)
-          var exprList: List[ExprTree] = List(parseExpression)
-          while (currentToken.kind != RBRACE) {
-            eat(SEMICOLON)
+          var exprList: List[ExprTree] = List()
+          if (currentToken.kind != RBRACE) {
             exprList ::= parseExpression
+            while (currentToken.kind != RBRACE) {
+              eat(SEMICOLON)
+              exprList ::= parseExpression
+            }
           }
           eat(RBRACE)
           Block(exprList.reverse)
