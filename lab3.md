@@ -21,7 +21,7 @@ before you submit it.
 
 ## Parser
 
-* Write a recursive-descent Parser for [punkt0](lab2.html) by manually
+* Write a recursive-descent Parser for [punkt0](lab2.md) by manually
   writing mutually recursive procedures, as sketched in the lecture on
   recursive descent parsing, and generating the appropriate abstract
   syntax trees.
