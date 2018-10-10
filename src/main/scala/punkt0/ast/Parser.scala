@@ -255,12 +255,14 @@ object Parser extends Phase[Iterator[Token], Program] {
         eat(LPAREN)
         var args: List[ExprTree] = List()
         if (currentToken.kind != RPAREN) {
-          do {
+          args = parseExpression :: args
+          while (currentToken.kind == COMMA) {
+            eat(COMMA)
             args = parseExpression :: args
-          } while (currentToken.kind == COMMA)
+          }
         }
         eat(RPAREN)
-        tree = MethodCall(tree, method, args)
+        tree = MethodCall(tree, method, args.reverse)
       }
 
       tree.setPos(thisToken)
