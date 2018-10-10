@@ -41,6 +41,8 @@ object Main {
     if (ctx.doTokens) {
       for (token <- Lexer.run(ctx.file.get)(ctx))
         print(token)
+      Reporter.terminateIfErrors()
+      sys.exit(0)
     }
 
     ctx
@@ -58,6 +60,5 @@ object Main {
 
     val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
     print(result)
-    Reporter.terminateIfErrors()
   }
 }
