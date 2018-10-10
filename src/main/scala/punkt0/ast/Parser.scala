@@ -10,7 +10,7 @@ object Parser extends Phase[Iterator[Token], Program] {
     /** Store the current token, as read from the lexer. */
     var currentToken: Token = new Token(BAD)
 
-    def readToken: Unit = {
+    def readToken(): Unit = {
       if (tokens.hasNext) {
         // uses nextToken from the Lexer trait
         currentToken = tokens.next
@@ -25,7 +25,7 @@ object Parser extends Phase[Iterator[Token], Program] {
     /** ''Eats'' the expected token, or terminates with an error. */
     def eat(kind: TokenKind): Unit = {
       if (currentToken.kind == kind) {
-        readToken
+        readToken()
       } else {
         expected(kind)
       }
@@ -81,13 +81,13 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR) {
         vars ::= parseVar
       }
-      var exprs: List[ExprTree] = List(parseExpression)
+      var expressions: List[ExprTree] = List(parseExpression)
       while (currentToken.kind == SEMICOLON) {
         eat(SEMICOLON)
-        exprs ::= parseExpression
+        expressions ::= parseExpression
       }
       eat(RBRACE)
-      MainDecl(name, extends_, vars.reverse, exprs.reverse)
+      MainDecl(name, extends_, vars.reverse, expressions.reverse)
     }
 
     def parseMethod: MethodDecl = {
@@ -114,14 +114,14 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR)
         vars ::= parseVar
 
-        var exprs: List[ExprTree] = List(parseExpression)
+        var expressions: List[ExprTree] = List(parseExpression)
         while (currentToken.kind == SEMICOLON) {
           eat(SEMICOLON)
-          exprs ::= parseExpression
+          expressions ::= parseExpression
         }
         eat(RBRACE)
 
-        MethodDecl(overrides, retType, name, args.reverse, vars.reverse, exprs.tail.reverse, exprs.head)
+        MethodDecl(overrides, retType, name, args.reverse, vars.reverse, expressions.tail.reverse, expressions.head)
     }
 
     def parseFormal: Formal = {
@@ -133,18 +133,18 @@ object Parser extends Phase[Iterator[Token], Program] {
 
     def parseVar: VarDecl = {
       eat(VAR)
-      var id = parseIdentifier()
+      val id = parseIdentifier()
       eat(COLON)
-      var type_ = parseType
+      val type_ = parseType
       eat(EQSIGN)
-      var expr = parseExpression
+      val expr = parseExpression
       eat(SEMICOLON)
       VarDecl(type_, id, expr)
     }
 
     def parseType: TypeTree = {
       val thisToken = currentToken
-      readToken
+      readToken()
       (thisToken.kind match {
         case INT =>
           IntType()
@@ -205,7 +205,6 @@ object Parser extends Phase[Iterator[Token], Program] {
           exprTree
         case LBRACE =>
           eat(LBRACE)
-          var allIsWell = true
           var exprList: List[ExprTree] = List(parseExpression)
           while (currentToken.kind != RBRACE) {
             eat(SEMICOLON)
@@ -262,7 +261,7 @@ object Parser extends Phase[Iterator[Token], Program] {
     }
 
     def eatTokenSequence(tokenKindList: List[TokenKind]): Unit =
-      tokenKindList.map(eat)
+      tokenKindList.foreach(eat)
 
     def parseIdentifier(token: Token = null): Identifier = {
       var token_ = token
@@ -334,7 +333,7 @@ object Parser extends Phase[Iterator[Token], Program] {
 
 
 
-    readToken
+    readToken()
     val tree = parseGoal
     terminateIfErrors()
     tree
