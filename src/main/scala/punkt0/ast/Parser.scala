@@ -102,8 +102,8 @@ object Parser extends Phase[Iterator[Token], Program] {
       var args: List[Formal] = List()
       if (currentToken.kind == IDKIND) {
         args ::= parseFormal
-        while (currentToken.kind == COLON) {
-          eat(COLON)
+        while (currentToken.kind == COMMA) {
+          eat(COMMA)
           args ::= parseFormal
         }
       }
@@ -114,14 +114,14 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == VAR)
         vars ::= parseVar
 
-        var expressions: List[ExprTree] = List(parseExpression)
-        while (currentToken.kind == SEMICOLON) {
-          eat(SEMICOLON)
-          expressions ::= parseExpression
-        }
-        eat(RBRACE)
+      var expressions: List[ExprTree] = List(parseExpression)
+      while (currentToken.kind == SEMICOLON) {
+        eat(SEMICOLON)
+        expressions ::= parseExpression
+      }
+      eat(RBRACE)
 
-        MethodDecl(overrides, retType, name, args.reverse, vars.reverse, expressions.tail.reverse, expressions.head)
+      MethodDecl(overrides, retType, name, args.reverse, vars.reverse, expressions.tail.reverse, expressions.head)
     }
 
     def parseFormal: Formal = {
