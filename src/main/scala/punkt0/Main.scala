@@ -12,21 +12,21 @@ object Main {
     var ctx = Context()
 
     def processOption(args: List[String]): Unit = args match {
-      case "--help" :: args =>
+      case "--help" :: argsTail =>
         ctx = ctx.copy(doHelp = true)
-        processOption(args)
+        processOption(argsTail)
 
-      case "-d" :: out :: args =>
+      case "-d" :: out :: argsTail =>
         ctx = ctx.copy(outDir = Some(new File(out)))
-        processOption(args)
+        processOption(argsTail)
 
-      case "--tokens" :: args =>
+      case "--tokens" :: argsTail =>
         ctx = ctx.copy(doTokens = true)
-        processOption(args)
+        processOption(argsTail)
 
-      case f :: args =>
+      case f :: argsTail =>
         ctx = ctx.copy(file = Some(new File(f)))
-        processOption(args)
+        processOption(argsTail)
 
       case List() =>
     }
