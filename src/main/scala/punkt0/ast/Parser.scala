@@ -182,14 +182,13 @@ object Parser extends Phase[Iterator[Token], Program] {
           eat(FALSE)
           False()
         case IDKIND =>
-          eat(IDKIND)
+          val identifier = parseIdentifier()
           if (currentToken.kind == EQSIGN) {
             // ident == expr
-            val identifier = parseIdentifier()
             eat(EQSIGN)
             Assign(identifier, parseExpression)
           } else // ident
-            parseIdentifier(thisToken)
+            identifier
         case THIS =>
           eat(THIS)
           This()
