@@ -161,18 +161,22 @@ object Parser extends Phase[Iterator[Token], Program] {
 
     def parseWeakExpression: ExprTree = {
       val thisToken = currentToken
-      readToken
 
-      var tree: ExprTree = thisToken.kind match {
+      var tree: ExprTree = currentToken.kind match {
         case INTLITKIND =>
+          eat(INTLITKIND)
           IntLit(thisToken.asInstanceOf[INTLIT].value)
         case STRLITKIND =>
+          eat(STRLITKIND)
           StringLit(thisToken.asInstanceOf[STRLIT].value)
         case TRUE =>
+          eat(TRUE)
           True()
         case FALSE =>
+          eat(FALSE)
           False()
         case IDKIND =>
+          eat(IDKIND)
           if (currentToken.kind == EQSIGN) {
             // ident == expr
             val identifier = parseIdentifier()
@@ -181,20 +185,26 @@ object Parser extends Phase[Iterator[Token], Program] {
           } else // ident
             parseIdentifier(thisToken)
         case THIS =>
+          eat(THIS)
           This()
         case NULL =>
+          eat(NULL)
           Null()
         case NEW =>
+          eat(NEW)
           val identifier = parseIdentifier()
           eatTokenSequence(List(LPAREN, RPAREN))
           New(identifier)
         case BANG =>
+          eat(BANG)
           Not(parseExpression)
         case LPAREN =>
+          eat(LPAREN)
           val exprTree = parseExpression
           eat(RPAREN)
           exprTree
         case LBRACE =>
+          eat(LBRACE)
           var allIsWell = true
           var exprList: List[ExprTree] = List(parseExpression)
           while (currentToken.kind != RBRACE) {
@@ -204,6 +214,7 @@ object Parser extends Phase[Iterator[Token], Program] {
           eat(RBRACE)
           Block(exprList.reverse)
         case IF =>
+          eat(IF)
           eat(LPAREN)
           val condExpr = parseExpression
           eat(RPAREN)
@@ -215,17 +226,22 @@ object Parser extends Phase[Iterator[Token], Program] {
             If(condExpr, trueExpr, None)
           }
         case WHILE =>
+          eat(WHILE)
           eat(LPAREN)
           val condExpr = parseExpression
           eat(RPAREN)
           While(condExpr, parseExpression)
         case PRINTLN =>
+          eat(PRINTLN)
           eat(LPAREN)
           val expr = parseExpression
           eat(RPAREN)
           Println(expr)
         case _ =>
-          expected(INTLITKIND, STRLITKIND, TRUE, FALSE)
+          expected(
+            INTLITKIND, STRLITKIND, TRUE, FALSE, IDKIND, THIS,
+            NULL, NEW, BANG, LPAREN, LBRACE, IF, WHILE, PRINTLN
+          )
       }
 
       if (currentToken.kind == DOT) {
