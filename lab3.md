@@ -2,7 +2,7 @@
 
 In this lab, you'll work on the second part of the punkt0 compiler
 project. Your goal is to manually implement a recursive-descent parser
-to transform programs described by the [punkt0 grammar](lab2.html)
+to transform programs described by the [punkt0 grammar](lab2.md)
 into abstract syntax trees. You also need to write a pretty-printer
 for these trees. This assignment is rather long and we can only
 recommend that you start early, that you make sure you understand
