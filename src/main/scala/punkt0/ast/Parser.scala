@@ -144,18 +144,24 @@ object Parser extends Phase[Iterator[Token], Program] {
 
     def parseType: TypeTree = {
       val thisToken = currentToken
-      readToken()
       (thisToken.kind match {
         case INT =>
+          eat(INT)
           IntType()
         case STRING =>
+          eat(STRING)
           StringType()
         case UNIT =>
+          eat(UNIT)
           UnitType()
         case BOOLEAN =>
+          eat(BOOLEAN)
           BooleanType()
         case IDKIND =>
+          eat(IDKIND)
           parseIdentifier(thisToken)
+        case _ =>
+          expected(INT, STRING, UNIT, BOOLEAN, IDKIND)
       }).setPos(thisToken)
     }
 
