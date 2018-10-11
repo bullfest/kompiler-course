@@ -95,26 +95,126 @@ object Trees {
       sb.append(" "*indent).append("}")
     }
   }
-  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree
+  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append(id.value).append(": ")
+      tpe.prettyPrint(sb, indent)
+    }
+  }
 
   sealed trait TypeTree extends Tree
-  case class BooleanType() extends TypeTree
-  case class IntType() extends TypeTree
-  case class StringType() extends TypeTree
-  case class UnitType() extends TypeTree
+  case class BooleanType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("Boolean")
+    }
+  }
+
+  case class IntType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("Int")
+    }
+  }
+
+  case class StringType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("String")
+    }
+  }
+
+  case class UnitType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("Unit")
+  }
+
 
   sealed trait ExprTree extends Tree
-  case class And(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Or(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Plus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Minus(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Times(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Div(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class LessThan(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class Equals(lhs: ExprTree, rhs: ExprTree) extends ExprTree
-  case class MethodCall(obj: ExprTree, meth: Identifier, args: List[ExprTree]) extends ExprTree
-  case class IntLit(value: Int) extends ExprTree
-  case class StringLit(value: String) extends ExprTree
+  case class And(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" && ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Or(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" || ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Plus(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" + ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Minus(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" - ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Times(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" * ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Div(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" / ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class LessThan(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" < ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class Equals(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      lhs.prettyPrint(sb, indent)
+      sb.append(" == ")
+      rhs.prettyPrint(sb, indent)
+    }
+  }
+
+  case class MethodCall(obj: ExprTree, meth: Identifier, args: List[ExprTree]) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      obj.prettyPrint(sb, indent)
+      sb.append(".").append(meth.value).append("(")
+      if (args.nonEmpty) {
+        args.head.prettyPrint(sb, indent)
+        for (arg <- args.tail) {
+          sb.append(", ")
+          arg.prettyPrint(sb, indent)
+        }
+        sb.append(")")
+      }
+    }
+  }
+
+  case class IntLit(value: Int) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append(value)
+  }
+  case class StringLit(value: String) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("\"").append(value).append("\"")
+  }
 
   case class True() extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
