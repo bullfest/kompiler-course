@@ -28,6 +28,10 @@ object Main {
         ctx = ctx.copy(doAST = true)
         processOption(argsTail)
 
+      case "--print" :: argsTail =>
+        ctx = ctx.copy(doPrintMain = true)
+        processOption(argsTail)
+
       case f :: argsTail =>
         ctx = ctx.copy(file = Some(new File(f)))
         processOption(argsTail)
@@ -55,6 +59,12 @@ object Main {
       sys.exit(0)
     }
 
+    if (ctx.doPrintMain) {
+      val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
+      print(Printer.apply(result))
+      sys.exit(0)
+    }
+
     ctx
   }
 
@@ -69,6 +79,5 @@ object Main {
     val ctx = processOptions(args)
 
     val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
-    print(Printer.apply(result))
   }
 }

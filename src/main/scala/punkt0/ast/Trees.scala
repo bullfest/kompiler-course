@@ -209,8 +209,8 @@ object Trees {
           sb.append(", ")
           arg.prettyPrint(sb, indent)
         }
-        sb.append(")")
       }
+      sb.append(")")
     }
   }
 
@@ -256,14 +256,21 @@ object Trees {
 
   case class Block(exprs: List[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
-      sb.append("{\n")
-      val indent2 = indent + indent_length
-      exprs.foreach(expr => {
-        sb.append(" "*indent2)
-        expr.prettyPrint(sb, indent2)
+      if (exprs.isEmpty)
+        sb.append("{}")
+      else {
+        sb.append("{\n")
+        val indent2 = indent + indent_length
+        sb.append(" " * indent2)
+        exprs.head.prettyPrint(sb, indent2)
+        exprs.tail.foreach(expr => {
+          sb.append("; \n")
+          sb.append(" " * indent2)
+          expr.prettyPrint(sb, indent2)
+        })
         sb.append("\n")
-      })
-      sb.append(" "*indent).append("}")
+        sb.append(" " * indent).append("}")
+      }
     }
   }
   case class If(expr: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree {
@@ -276,6 +283,7 @@ object Trees {
         thn.prettyPrint(sb, indent2)
       } else {
         sb.append("{\n")
+        sb.append(" "*indent2)
         thn.prettyPrint(sb, indent2)
         sb.append("\n")
         sb.append(" "*indent).append("}")
@@ -284,10 +292,11 @@ object Trees {
         case Some(e) =>
           sb.append(" else ")
           if (thn.isInstanceOf[Block]) {
-            thn.prettyPrint(sb, indent2)
+            e.prettyPrint(sb, indent2)
           } else {
             sb.append("{\n")
-            thn.prettyPrint(sb, indent2)
+            sb.append(" "*indent2)
+            e.prettyPrint(sb, indent2)
             sb.append("\n")
             sb.append(" "*indent).append("}")
           }
@@ -299,9 +308,17 @@ object Trees {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append("while (")
       cond.prettyPrint(sb, indent)
-      sb.append(") {\n")
+      sb.append(") ")
       val indent2 = indent + indent_length
-      body.prettyPrint(sb, indent2)
+      if (body.isInstanceOf[Block]) {
+        body.prettyPrint(sb, indent)
+      } else {
+        sb.append("{\n")
+        sb.append(" "*indent2)
+        body.prettyPrint(sb, indent2)
+        sb.append("\n")
+        sb.append(" "*indent).append("}")
+      }
     }
   }
   case class Println(expr: ExprTree) extends ExprTree {
