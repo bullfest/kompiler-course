@@ -2,13 +2,98 @@ package punkt0
 package ast
 
 object Trees {
-  sealed trait Tree extends Positioned
+  sealed trait Tree extends Positioned {
+    def prettyPrint(sb: StringBuilder, indent: Int): Unit
+  }
 
-  case class Program(main: MainDecl, classes: List[ClassDecl]) extends Tree
-  case class MainDecl(obj: Identifier, parent: Identifier, vars: List[VarDecl], exprs: List[ExprTree]) extends Tree
-  case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree
-  case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree
-  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree {
+  case class Program(main: MainDecl, classes: List[ClassDecl]) extends Tree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      classes.foreach(c => {c.prettyPrint(sb, indent); sb.append("\n\n")})
+      main.prettyPrint(sb, indent)
+    }
+  }
+
+  case class MainDecl(obj: Identifier, parent: Identifier, vars: List[VarDecl], exprs: List[ExprTree]) extends Tree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
+      sb.append(" "*indent).append("object ").append(obj.value).append(" extends ").append(parent.value).append(" {\n")
+      val indent2 = indent + 2
+      for (var_ <- vars) {
+        sb.append(" "*indent2)
+        var_.prettyPrint(sb, indent2)
+        sb.append("\n")
+      }
+      for (expression <- exprs) {
+        sb.append(" "*indent2)
+        expression.prettyPrint(sb, indent2)
+        sb.append(";\n")
+      }
+      sb.dropRight(2).append("\n")
+      sb.append(" "*indent).append("}")
+    }
+  }
+
+  case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
+      sb.append(" "*indent).append("class ").append(id.value)
+      parent match {
+        case Some(p) => sb.append(" extends ").append(p.value)
+        case None => Unit
+      }
+      sb.append(" {\n")
+      val indent2 = indent + 2
+      for (var_ <- vars) {
+        sb.append(" "*indent2)
+        var_.prettyPrint(sb, indent2)
+        sb.append("\n")
+      }
+      for (meth <- methods) {
+        sb.append(" " * indent2)
+        meth.prettyPrint(sb, indent2)
+        sb.append("\n")
+      }
+      sb.append(" "*indent).append("}")
+    }
+  }
+  case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
+      sb.append("var ").append(id.value).append(": ")
+      tpe.prettyPrint(sb, indent)
+      sb.append(" = ")
+      expr.prettyPrint(sb, indent)
+      sb.append(";")
+    }
+  }
+  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree  {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
+      if (overrides)
+        sb.append("overrides ")
+      sb.append("def ").append(id.value).append("(")
+      if (args.nonEmpty) {
+        args.head.prettyPrint(sb, indent)
+        for (arg <- args.tail) {
+          sb.append(", ")
+          arg.prettyPrint(sb, indent)
+        }
+      }
+      sb.append("): ")
+      retType.prettyPrint(sb, indent)
+      sb.append(" = {")
+      val indent2 = indent + 2
+      for (var_ <- vars) {
+        sb.append(" "*indent2)
+        var_.prettyPrint(sb, indent2)
+        sb.append("\n")
+      }
+      for (expression <- exprs) {
+        sb.append(" "*indent2)
+        expression.prettyPrint(sb, indent2)
+        sb.append(";\n")
+      }
+      sb.dropRight(2).append("\n")
+      sb.append(" "* indent2)
+      retExpr.prettyPrint(sb, indent2)
+      sb.append(" "*indent).append("}")
+    }
   }
   sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree
 
