@@ -20,9 +20,13 @@ sealed abstract class TokenMatcher(tokenKind: TokenKind, literalString: String =
     }
 
   def matchingPrefixLength(s: String): Int =
-    if (literalString != null)
-      commonPrefixLength(s, literalString)
-    else if (matchRegex != null)
+    if (literalString != null) {
+      val prefixLength = commonPrefixLength(s, literalString)
+      if (prefixLength < literalString.length)
+        0
+      else
+        prefixLength
+    } else if (matchRegex != null)
       regex.findPrefixMatchOf(s) match {
         case Some(prefix) =>
           prefix.matched.length
