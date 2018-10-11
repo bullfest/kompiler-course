@@ -55,7 +55,7 @@ object Trees {
       for (meth <- methods) {
         sb.append(" " * indent2)
         meth.prettyPrint(sb, indent2)
-        sb.append("\n")
+        sb.append("\n\n")
       }
       sb.append(" "*indent).append("}")
     }
@@ -271,7 +271,8 @@ object Trees {
       sb.append(") {\n")
       val indent2 = indent + indent_length
       thn.prettyPrint(sb, indent2)
-      sb.append("}")
+      sb.append("\n")
+      sb.append(" "*indent).append("}")
       els match {
         case Some(e) =>
           sb.append(" else {\n")
