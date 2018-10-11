@@ -257,27 +257,40 @@ object Trees {
   case class Block(exprs: List[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append("{\n")
-      val ident2 = indent + indent_length
+      val indent2 = indent + indent_length
       exprs.foreach(expr => {
-        expr.prettyPrint(sb, ident2)
+        sb.append(" "*indent2)
+        expr.prettyPrint(sb, indent2)
+        sb.append("\n")
       })
-      sb.append("}")
+      sb.append(" "*indent).append("}")
     }
   }
   case class If(expr: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append("if (")
       expr.prettyPrint(sb, indent)
-      sb.append(") {\n")
+      sb.append(") ")
       val indent2 = indent + indent_length
-      thn.prettyPrint(sb, indent2)
-      sb.append("\n")
-      sb.append(" "*indent).append("}")
+      if (thn.isInstanceOf[Block]) {
+        thn.prettyPrint(sb, indent2)
+      } else {
+        sb.append("{\n")
+        thn.prettyPrint(sb, indent2)
+        sb.append("\n")
+        sb.append(" "*indent).append("}")
+      }
       els match {
         case Some(e) =>
-          sb.append(" else {\n")
-          e.prettyPrint(sb, indent2)
-          sb.append("}")
+          sb.append(" else ")
+          if (thn.isInstanceOf[Block]) {
+            thn.prettyPrint(sb, indent2)
+          } else {
+            sb.append("{\n")
+            thn.prettyPrint(sb, indent2)
+            sb.append("\n")
+            sb.append(" "*indent).append("}")
+          }
         case None => Unit
       }
     }
