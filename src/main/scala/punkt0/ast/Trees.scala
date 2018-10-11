@@ -2,6 +2,7 @@ package punkt0
 package ast
 
 object Trees {
+  val indent_length = 2
   sealed trait Tree extends Positioned {
     def prettyPrint(sb: StringBuilder, indent: Int): Unit
   }
@@ -10,6 +11,7 @@ object Trees {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       classes.foreach(c => {c.prettyPrint(sb, indent); sb.append("\n\n")})
       main.prettyPrint(sb, indent)
+      sb.append("\n")
     }
   }
 
@@ -22,12 +24,16 @@ object Trees {
         var_.prettyPrint(sb, indent2)
         sb.append("\n")
       }
-      for (expression <- exprs) {
-        sb.append(" "*indent2)
-        expression.prettyPrint(sb, indent2)
-        sb.append(";\n")
+      if (exprs.nonEmpty) {
+        sb.append(" " * indent2)
+        exprs.head.prettyPrint(sb, indent2)
+        for (expression <- exprs.tail) {
+          sb.append(";\n")
+          sb.append(" " * indent2)
+          expression.prettyPrint(sb, indent2)
+        }
       }
-      sb.dropRight(2).append("\n")
+      sb.append("\n")
       sb.append(" "*indent).append("}")
     }
   }
@@ -40,7 +46,7 @@ object Trees {
         case None => Unit
       }
       sb.append(" {\n")
-      val indent2 = indent + 2
+      val indent2 = indent + indent_length
       for (var_ <- vars) {
         sb.append(" "*indent2)
         var_.prettyPrint(sb, indent2)
@@ -77,8 +83,8 @@ object Trees {
       }
       sb.append("): ")
       retType.prettyPrint(sb, indent)
-      sb.append(" = {")
-      val indent2 = indent + 2
+      sb.append(" = {\n")
+      val indent2 = indent + indent_length
       for (var_ <- vars) {
         sb.append(" "*indent2)
         var_.prettyPrint(sb, indent2)
@@ -92,6 +98,7 @@ object Trees {
       sb.dropRight(2).append("\n")
       sb.append(" "* indent2)
       retExpr.prettyPrint(sb, indent2)
+      sb.append("\n")
       sb.append(" "*indent).append("}")
     }
   }
@@ -250,7 +257,7 @@ object Trees {
   case class Block(exprs: List[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append("{\n")
-      val ident2 = indent + 2
+      val ident2 = indent + indent_length
       exprs.foreach(expr => {
         expr.prettyPrint(sb, ident2)
       })
@@ -262,15 +269,14 @@ object Trees {
       sb.append("if (")
       expr.prettyPrint(sb, indent)
       sb.append(") {\n")
-      val indent2 = indent + 2
+      val indent2 = indent + indent_length
       thn.prettyPrint(sb, indent2)
       sb.append("}")
       els match {
-        case Some(e) => {
+        case Some(e) =>
           sb.append(" else {\n")
           e.prettyPrint(sb, indent2)
           sb.append("}")
-        }
         case None => Unit
       }
     }
@@ -280,7 +286,7 @@ object Trees {
       sb.append("while (")
       cond.prettyPrint(sb, indent)
       sb.append(") {\n")
-      val indent2 = indent + 2
+      val indent2 = indent + indent_length
       body.prettyPrint(sb, indent2)
     }
   }
