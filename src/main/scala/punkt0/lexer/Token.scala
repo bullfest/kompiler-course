@@ -64,6 +64,7 @@ class INTLIT(val value: Int) extends Token(INTLITKIND) {
 }
 
 // string literals
-class STRLIT(val value: String) extends Token(STRLITKIND) {
+class STRLIT(val value_ : String) extends Token(STRLITKIND) {
+  val value: String = value_.substring(1, value_.length-1)
   override def toString: String = "STR(" + value + ")" + this.posString
 }
