@@ -251,7 +251,7 @@ object Parser extends Phase[Iterator[Token], Program] {
           )
       }
 
-      if (currentToken.kind == DOT) {
+      while (currentToken.kind == DOT) {
         eat(DOT)
         val method = parseIdentifier()
         eat(LPAREN)
