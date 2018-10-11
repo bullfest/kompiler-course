@@ -116,17 +116,86 @@ object Trees {
   case class IntLit(value: Int) extends ExprTree
   case class StringLit(value: String) extends ExprTree
 
-  case class True() extends ExprTree
-  case class False() extends ExprTree
-  case class Identifier(value: String) extends TypeTree with ExprTree
-  case class This() extends ExprTree
-  case class Null() extends ExprTree
-  case class New(tpe: Identifier) extends ExprTree
-  case class Not(expr: ExprTree) extends ExprTree
+  case class True() extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("true")
+  }
+  case class False() extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("false")
+  }
+  case class Identifier(value: String) extends TypeTree with ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append(value)
+  }
+  case class This() extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("this")
+  }
+  case class Null() extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("null")
+  }
+  case class New(tpe: Identifier) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit =
+      sb.append("new ").append(tpe.value).append("()")
+  }
+  case class Not(expr: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("!")
+      expr.prettyPrint(sb, indent)
+    }
+  }
 
-  case class Block(exprs: List[ExprTree]) extends ExprTree
-  case class If(expr: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree
-  case class While(cond: ExprTree, body: ExprTree) extends ExprTree
-  case class Println(expr: ExprTree) extends ExprTree
-  case class Assign(id: Identifier, expr: ExprTree) extends ExprTree
+  case class Block(exprs: List[ExprTree]) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("{\n")
+      val ident2 = indent + 2
+      exprs.foreach(expr => {
+        expr.prettyPrint(sb, ident2)
+      })
+      sb.append("}")
+    }
+  }
+  case class If(expr: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("if (")
+      expr.prettyPrint(sb, indent)
+      sb.append(") {\n")
+      val indent2 = indent + 2
+      thn.prettyPrint(sb, indent2)
+      sb.append("}")
+      els match {
+        case Some(e) => {
+          sb.append(" else {\n")
+          e.prettyPrint(sb, indent2)
+          sb.append("}")
+        }
+        case None => Unit
+      }
+    }
+  }
+  case class While(cond: ExprTree, body: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("while (")
+      cond.prettyPrint(sb, indent)
+      sb.append(") {\n")
+      val indent2 = indent + 2
+      body.prettyPrint(sb, indent2)
+    }
+  }
+  case class Println(expr: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append("println(")
+      expr.prettyPrint(sb, indent)
+      sb.append(")")
+    }
+  }
+  case class Assign(id: Identifier, expr: ExprTree) extends ExprTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
+      sb.append(id.value)
+      sb.append(" = ")
+      expr.prettyPrint(sb, indent)
+    }
+  }
 }
