@@ -46,7 +46,9 @@ object Parser extends Phase[Iterator[Token], Program] {
       while (currentToken.kind == CLASS) {
         classes ::= parseClass
       }
-      Program(parseMain, classes.reverse).setPos(thisToken)
+      val main = parseMain
+      eat(EOF)
+      Program(main, classes.reverse).setPos(thisToken)
     }
 
     def parseClass: ClassDecl = {
