@@ -282,11 +282,9 @@ object Trees {
       if (thn.isInstanceOf[Block]) {
         thn.prettyPrint(sb, indent2)
       } else {
-        sb.append("{\n")
+        sb.append("\n")
         sb.append(" "*indent2)
         thn.prettyPrint(sb, indent2)
-        sb.append("\n")
-        sb.append(" "*indent).append("}")
       }
       els match {
         case Some(e) =>
@@ -294,11 +292,9 @@ object Trees {
           if (thn.isInstanceOf[Block]) {
             e.prettyPrint(sb, indent2)
           } else {
-            sb.append("{\n")
+            sb.append("\n")
             sb.append(" "*indent2)
             e.prettyPrint(sb, indent2)
-            sb.append("\n")
-            sb.append(" "*indent).append("}")
           }
         case None => Unit
       }
@@ -313,11 +309,9 @@ object Trees {
       if (body.isInstanceOf[Block]) {
         body.prettyPrint(sb, indent)
       } else {
-        sb.append("{\n")
+        sb.append("\n")
         sb.append(" "*indent2)
         body.prettyPrint(sb, indent2)
-        sb.append("\n")
-        sb.append(" "*indent).append("}")
       }
     }
   }
