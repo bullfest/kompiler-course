@@ -202,7 +202,7 @@ object Parser extends Phase[Iterator[Token], Program] {
           New(identifier)
         case BANG =>
           eat(BANG)
-          Not(parseExpression)
+          Not(parseWeakExpression)
         case LPAREN =>
           eat(LPAREN)
           val exprTree = parseExpression
