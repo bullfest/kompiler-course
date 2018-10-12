@@ -285,16 +285,19 @@ object Parser extends Phase[Iterator[Token], Program] {
     }
 
     def parseStrongExpression4: ExprTree = {
-      val expr = parseWeakExpression
-      if (currentToken.kind == TIMES) {
-        eat(TIMES)
-        Times(expr, parseStrongExpression4)
-      } else if (currentToken.kind == DIV) {
-        eat(DIV)
-        Div(expr, parseStrongExpression4)
-      } else {
-        expr
+      var expr = parseWeakExpression
+      while (List(TIMES, DIV).contains(currentToken.kind)) {
+        currentToken.kind match {
+          case TIMES =>
+            eat(TIMES)
+            expr = Times(expr, parseWeakExpression)
+          case DIV =>
+            eat(DIV)
+            expr = Div(expr, parseWeakExpression)
+          case _ => expr
+        }
       }
+      expr
     }
 
     def parseStrongExpression3: ExprTree = {
