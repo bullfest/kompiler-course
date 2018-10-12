@@ -301,16 +301,19 @@ object Parser extends Phase[Iterator[Token], Program] {
     }
 
     def parseStrongExpression3: ExprTree = {
-      val expr = parseStrongExpression4
-      if (currentToken.kind == PLUS) {
-        eat(PLUS)
-        Plus(expr, parseStrongExpression3)
-      } else if (currentToken.kind == MINUS) {
-        eat(MINUS)
-        Minus(expr, parseStrongExpression3)
-      } else {
-        expr
+      var expr = parseStrongExpression4
+      while (List(PLUS, MINUS).contains(currentToken.kind)) {
+        currentToken.kind match {
+          case PLUS =>
+            eat(PLUS)
+            expr = Plus(expr, parseStrongExpression4)
+          case MINUS =>
+            eat(MINUS)
+            expr = Minus(expr, parseStrongExpression4)
+          case _ => expr
+        }
       }
+      expr
     }
 
     def parseStrongExpression2: ExprTree = {
@@ -345,8 +348,6 @@ object Parser extends Phase[Iterator[Token], Program] {
         expr
       }
     }
-
-
 
     readToken()
     val tree = parseGoal
