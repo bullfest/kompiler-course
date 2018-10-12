@@ -294,7 +294,8 @@ object Parser extends Phase[Iterator[Token], Program] {
           case DIV =>
             eat(DIV)
             expr = Div(expr, parseWeakExpression)
-          case _ => expr
+          case _ =>
+            expr
         }
       }
       expr
@@ -310,43 +311,46 @@ object Parser extends Phase[Iterator[Token], Program] {
           case MINUS =>
             eat(MINUS)
             expr = Minus(expr, parseStrongExpression4)
-          case _ => expr
+          case _ =>
+            expr
         }
       }
       expr
     }
 
     def parseStrongExpression2: ExprTree = {
-      val expr = parseStrongExpression3
-      if (currentToken.kind == LESSTHAN) {
-        eat(LESSTHAN)
-        LessThan(expr, parseStrongExpression2)
-      } else if (currentToken.kind == EQUALS) {
-        eat(EQUALS)
-        Equals(expr, parseStrongExpression2)
-      } else {
-        expr
+      var expr = parseStrongExpression3
+      while (List(LESSTHAN, EQUALS).contains(currentToken.kind)) {
+        currentToken.kind match {
+          case LESSTHAN =>
+            eat(LESSTHAN)
+            expr = LessThan(expr, parseStrongExpression3)
+          case EQUALS =>
+            eat(EQUALS)
+            expr = Equals(expr, parseStrongExpression3)
+          case _ =>
+            expr
+        }
       }
+      expr
     }
 
     def parseStrongExpression1: ExprTree = {
-      val expr = parseStrongExpression2
-      if (currentToken.kind == AND) {
+      var expr = parseStrongExpression2
+      while (currentToken.kind == AND) {
         eat(AND)
-        And(expr, parseStrongExpression1)
-      } else {
-        expr
+        expr = And(expr, parseStrongExpression2)
       }
+      expr
     }
 
     def parseExpression: ExprTree = {
-      val expr = parseStrongExpression1
-      if (currentToken.kind == OR) {
+      var expr = parseStrongExpression1
+      while (currentToken.kind == OR) {
         eat(OR)
-        Or(expr, parseExpression)
-      } else {
-        expr
+        expr = Or(expr, parseStrongExpression1)
       }
+      expr
     }
 
     readToken()
