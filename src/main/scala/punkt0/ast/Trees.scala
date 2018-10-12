@@ -72,7 +72,7 @@ object Trees {
   case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree  {
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit= {
       if (overrides)
-        sb.append("overrides ")
+        sb.append("override ")
       sb.append("def ").append(id.value).append("(")
       if (args.nonEmpty) {
         args.head.prettyPrint(sb, indent)
