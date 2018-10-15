@@ -10,6 +10,12 @@ object Types {
 
     def setType(tpe: Type): this.type = { _tpe = tpe; this }
     def getType: Type = _tpe
+    def getTypeStr: String = {
+      try getType.toString
+      catch {
+        case t: Throwable => "??"
+      }
+    }
   }
 
   sealed abstract class Type {
@@ -33,13 +39,12 @@ object Types {
     }
     override def toString = "Int"
   }
-
   // TODO: Complete by creating necessary types
-
   case class TAnyRef(classSymbol: ClassSymbol) extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = ???
     override def toString = classSymbol.name
   }
+
 
   // special object to implement the fact that all objects are its subclasses
   val anyRef = TAnyRef(new ClassSymbol("AnyRef"))
