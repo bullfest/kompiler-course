@@ -191,7 +191,7 @@ this. Detect as many errors as possible!
 
 For grading you need to produce an AST that annotates each identifier with a
 unique ID and each node that is a subclass of ExprTree with the type of that
-expression. Examples can be found in the testprograms folder. If you are using
-the classes as provided by the stubs you can use analyzer.TypedASTPrinter
-for printing the anotated AST.
+expression given the `--ast+` option. Examples can be found in the testprograms
+folder. If you are using the classes as provided by the stubs you can use
+`analyzer.TypedASTPrinter` for printing the anotated AST.
 
