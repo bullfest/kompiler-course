@@ -234,11 +234,3 @@ All other types of shadowing are not allowed in Punkt0.
     course this constraint will be tightened once we start checking
     types.) An overriding method must have an `override` modifier.
   * Fields cannot be overridden.
-
-
-## Stubs
-
-We provide [code stubs](namer-stubs.zip) for your name analyzer
-component (note that file `ast/Trees.scala` has been updated to
-include symbol information). The ZIP archive also contains all files
-of the parser stubs.
