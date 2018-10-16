@@ -12,7 +12,7 @@ just like "javac" and "scalac" do.
 A valid Punkt0 program has the following properties:
 
 * It follows the Punkt0 concrete syntax.
-* It respects all the constraints mentioned in [Lab 4](lab4.html).
+* It respects all the constraints mentioned in [Lab 4](lab4.md).
 * Method overriding respects some typing constraints:
   * The overriding method must have exactly as many parameters as the overridden one.
   * The types of the parameters in the overriding and overridden methods must match exactly (no contravariance allowed).
@@ -189,9 +189,8 @@ this. Detect as many errors as possible!
 
 ## Grading
 
-For grading you need to produce an AST that annotates each identifier with a
-unique ID and each node that is a subclass of ExprTree with the type of that
+You need to support a command-line option `--ast+` for producing an AST that annotates each identifier with a
+unique ID. Each node is a subclass of ExprTree with the type of that
 expression given the `--ast+` option. Examples can be found in the testprograms
 folder. If you are using the classes as provided by the stubs you can use
 `analyzer.TypedASTPrinter` for printing the anotated AST.
-
