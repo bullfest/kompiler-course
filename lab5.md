@@ -187,8 +187,11 @@ It is very important that your compiler does not stop at the first
 type error! `TypeChecker.scala` contains some hints on how to achieve
 this. Detect as many errors as possible!
 
-## Stubs
+## Grading
 
-We provide [code stubs](typer-stubs.zip) for your type checker
-component. The ZIP archive also includes all files of the previous
-stubs.
+For grading you need to produce an AST that annotates each identifier with a
+unique ID and each node that is a subclass of ExprTree with the type of that
+expression. Examples can be found in the testprograms folder. If you are using
+the classes as provided by the stubs you can use analyzer.TypedASTPrinter
+for printing the anotated AST.
+
