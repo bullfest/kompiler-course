@@ -234,3 +234,8 @@ All other types of shadowing are not allowed in Punkt0.
     course this constraint will be tightened once we start checking
     types.) An overriding method must have an `override` modifier.
   * Fields cannot be overridden.
+
+## Grading
+
+For grading you need to implement command-line option `--symid` according to the above.
+Examples can be found in the testprograms folder. And note that Lab4 and Lab5 will be graded together.
