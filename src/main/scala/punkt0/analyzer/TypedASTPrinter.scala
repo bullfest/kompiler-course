@@ -21,7 +21,7 @@ object TypedASTPrinter {
     }
 
     def methodId(id:Identifier):String = {
-        indent + id.value + "#" + id.getSymbol.id
+        indent + "Identifier(" + id.value + "#" + id.getSymbol.id + ")"
     }
 
     def apply(t:Tree):String = {

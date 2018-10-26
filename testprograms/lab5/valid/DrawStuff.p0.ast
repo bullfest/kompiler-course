@@ -11,7 +11,7 @@ Program(
               New(
                 Identifier(ConcentricCircles#2):ConcentricCircles
               ):ConcentricCircles,
-              render#7,
+              Identifier(render#7),
               [
               ]
             ):String
@@ -21,7 +21,7 @@ Program(
               New(
                 Identifier(Mandelbrot#3):Mandelbrot
               ):Mandelbrot,
-              render#7,
+              Identifier(render#7),
               [
               ]
             ):String
@@ -31,7 +31,7 @@ Program(
               New(
                 Identifier(Cross#4):Cross
               ):Cross,
-              render#7,
+              Identifier(render#7),
               [
               ]
             ):String
@@ -58,7 +58,7 @@ Program(
       [
         MethodDecl(false,
           StringType(),
-          render#7,
+          Identifier(render#7),
           [
           ],
           [
@@ -131,7 +131,7 @@ Program(
                           Identifier(depth#8):Int,
                           MethodCall(
                             This():Drawable,
-                            computePixel#13,
+                            Identifier(computePixel#13),
                             [
                               Identifier(x#11):Int,
                               Identifier(y#12):Int
@@ -280,7 +280,7 @@ Program(
             Println(
               MethodCall(
                 This():Drawable,
-                getDesc#16,
+                Identifier(getDesc#16),
                 [
                 ]
               ):String
@@ -314,7 +314,7 @@ Program(
         ),
         MethodDecl(false,
           IntType(),
-          computePixel#13,
+          Identifier(computePixel#13),
           [
             Formal(
               IntType(),
@@ -333,7 +333,7 @@ Program(
         ),
         MethodDecl(false,
           StringType(),
-          getDesc#16,
+          Identifier(getDesc#16),
           [
           ],
           [
@@ -351,7 +351,7 @@ Program(
       [
         MethodDecl(true,
           IntType(),
-          computePixel#17,
+          Identifier(computePixel#17),
           [
             Formal(
               IntType(),
@@ -494,7 +494,7 @@ Program(
         ),
         MethodDecl(true,
           StringType(),
-          getDesc#27,
+          Identifier(getDesc#27),
           [
           ],
           [
@@ -512,7 +512,7 @@ Program(
       [
         MethodDecl(true,
           IntType(),
-          computePixel#28,
+          Identifier(computePixel#28),
           [
             Formal(
               IntType(),
@@ -673,7 +673,7 @@ Program(
         ),
         MethodDecl(true,
           StringType(),
-          getDesc#38,
+          Identifier(getDesc#38),
           [
           ],
           [
@@ -691,7 +691,7 @@ Program(
       [
         MethodDecl(true,
           IntType(),
-          computePixel#39,
+          Identifier(computePixel#39),
           [
             Formal(
               IntType(),
@@ -885,7 +885,7 @@ Program(
         ),
         MethodDecl(true,
           StringType(),
-          getDesc#50,
+          Identifier(getDesc#50),
           [
           ],
           [
