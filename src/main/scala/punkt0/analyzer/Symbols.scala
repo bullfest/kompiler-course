@@ -1,6 +1,8 @@
 package punkt0
 package analyzer
 
+import scala.collection.mutable
+
 object Symbols {
 
   trait Symbolic[S <: Symbol] {
@@ -62,9 +64,8 @@ object Symbols {
   }
 
   class MethodSymbol(val name: String, val classSymbol: ClassSymbol) extends Symbol {
-    var params: Map[String, VariableSymbol] = Map[String, VariableSymbol]()
+    var params: mutable.LinkedHashMap[String, VariableSymbol] = mutable.LinkedHashMap[String, VariableSymbol]()
     var members: Map[String, VariableSymbol] = Map[String, VariableSymbol]()
-    var argList: List[VariableSymbol] = Nil
     var overridden: Option[MethodSymbol] = None
 
     def lookupVar(n: String): Option[VariableSymbol] = members.get(n) match {
