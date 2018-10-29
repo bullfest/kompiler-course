@@ -70,7 +70,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       }
       eat(RBRACE)
 
-      ClassDecl(name, extends_, vars.reverse, methods.reverse)
+      ClassDecl(name, extends_, vars.reverse, methods.reverse).setPos(name)
     }
 
     def parseMain: MainDecl = {
@@ -89,7 +89,7 @@ object Parser extends Phase[Iterator[Token], Program] {
         expressions ::= parseExpression
       }
       eat(RBRACE)
-      MainDecl(name, extends_, vars.reverse, expressions.reverse)
+      MainDecl(name, extends_, vars.reverse, expressions.reverse).setPos(name)
     }
 
     def parseMethod: MethodDecl = {
@@ -123,14 +123,14 @@ object Parser extends Phase[Iterator[Token], Program] {
       }
       eat(RBRACE)
 
-      MethodDecl(overrides, retType, name, args.reverse, vars.reverse, expressions.tail.reverse, expressions.head)
+      MethodDecl(overrides, retType, name, args.reverse, vars.reverse, expressions.tail.reverse, expressions.head).setPos(name)
     }
 
     def parseFormal: Formal = {
       val id = parseIdentifier()
       eat(COLON)
       val type_ = parseType
-      Formal(type_, id)
+      Formal(type_, id).setPos(id)
     }
 
     def parseVar: VarDecl = {
@@ -141,7 +141,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       eat(EQSIGN)
       val expr = parseExpression
       eat(SEMICOLON)
-      VarDecl(type_, id, expr)
+      VarDecl(type_, id, expr).setPos(id)
     }
 
     def parseType: TypeTree = {
@@ -304,13 +304,14 @@ object Parser extends Phase[Iterator[Token], Program] {
     def parseStrongExpression3: ExprTree = {
       var expr = parseStrongExpression4
       while (List(PLUS, MINUS).contains(currentToken.kind)) {
+        val operator = currentToken
         currentToken.kind match {
           case PLUS =>
             eat(PLUS)
-            expr = Plus(expr, parseStrongExpression4)
+            expr = Plus(expr, parseStrongExpression4).setPos(operator)
           case MINUS =>
             eat(MINUS)
-            expr = Minus(expr, parseStrongExpression4)
+            expr = Minus(expr, parseStrongExpression4).setPos(operator)
           case _ =>
             expr
         }
@@ -321,13 +322,14 @@ object Parser extends Phase[Iterator[Token], Program] {
     def parseStrongExpression2: ExprTree = {
       var expr = parseStrongExpression3
       while (List(LESSTHAN, EQUALS).contains(currentToken.kind)) {
+        val operator = currentToken
         currentToken.kind match {
           case LESSTHAN =>
             eat(LESSTHAN)
-            expr = LessThan(expr, parseStrongExpression3)
+            expr = LessThan(expr, parseStrongExpression3).setPos(operator)
           case EQUALS =>
             eat(EQUALS)
-            expr = Equals(expr, parseStrongExpression3)
+            expr = Equals(expr, parseStrongExpression3).setPos(operator)
           case _ =>
             expr
         }
@@ -338,8 +340,9 @@ object Parser extends Phase[Iterator[Token], Program] {
     def parseStrongExpression1: ExprTree = {
       var expr = parseStrongExpression2
       while (currentToken.kind == AND) {
+        val operator = currentToken
         eat(AND)
-        expr = And(expr, parseStrongExpression2)
+        expr = And(expr, parseStrongExpression2).setPos(operator)
       }
       expr
     }
@@ -347,8 +350,9 @@ object Parser extends Phase[Iterator[Token], Program] {
     def parseExpression: ExprTree = {
       var expr = parseStrongExpression1
       while (currentToken.kind == OR) {
+        val operator = currentToken
         eat(OR)
-        expr = Or(expr, parseStrongExpression1)
+        expr = Or(expr, parseStrongExpression1).setPos(operator)
       }
       expr
     }
