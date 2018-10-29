@@ -9,6 +9,10 @@ object NameAnalysis extends Phase[Program, Program] {
   def run(prog: Program)(ctx: Context): Program = {
     import Reporter._
 
+    val globalScope = new Symbols.GlobalScope
+
+    globalScope.mainClass = prog.main.collectSymbol
+
     // Step 1: Collect symbols in declarations
     // Step 2: Attach symbols to identifiers (except method calls) in method bodies
     // (Step 3:) Print tree with symbol ids for debugging

@@ -21,6 +21,18 @@ object Trees {
   }
 
   case class MainDecl(obj: Identifier, parent: Identifier, vars: List[VarDecl], exprs: List[ExprTree]) extends Tree with Symbolic[ClassSymbol] {
+
+    def collectSymbol: ClassSymbol = {
+      val symbol = new ClassSymbol(obj.value)
+      setSymbol(symbol)
+      obj.setSymbol(symbol)
+      for (variable <- vars) {
+        val varSymbol = variable.collectSymbol
+        symbol.members += (varSymbol.name -> varSymbol)
+      }
+      symbol
+    }
+
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append(" " * indent).append("object ").append(obj.value).append(" extends ").append(parent.value).append(" {\n")
       val indent2 = indent + 2
@@ -44,6 +56,21 @@ object Trees {
   }
 
   case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree with Symbolic[ClassSymbol] {
+    def collectSymbol: ClassSymbol = {
+      val symbol = new ClassSymbol(id.value)
+      setSymbol(symbol)
+      id.setSymbol(symbol)
+      for (variable <- vars) {
+        val varSymbol = variable.collectSymbol
+        symbol.members += (varSymbol.name -> varSymbol)
+      }
+      for (meth <- methods) {
+        val methSymbol = meth.collectSymbol(symbol)
+        symbol.methods += (methSymbol.name -> methSymbol)
+      }
+      symbol
+    }
+
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append(" " * indent).append("class ").append(id.value)
       parent match {
@@ -67,6 +94,14 @@ object Trees {
   }
 
   case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree with Symbolic[VariableSymbol] {
+
+    def collectSymbol: VariableSymbol = {
+      val symbol = new VariableSymbol(id.value)
+      id.setSymbol(symbol)
+      setSymbol(symbol)
+      symbol
+    }
+
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append("var ").append(id.value).append(": ")
       tpe.prettyPrint(sb, indent)
