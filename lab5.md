@@ -194,4 +194,8 @@ unique ID. Each node is a subclass of ExprTree with the type of that
 expression given the `--ast+` option. Examples can be found in the testprograms
 folder. If you are using the classes as provided by the stubs you can use
 `analyzer.TypedASTPrinter` for printing the anotated AST.
-Similarly, your compiler should terminate with exit code 1 if it detects errors.
+
+Note: after typechecking the methods should have an attached id when printing with
+`--symid` or `--ast+`. For grading, please use the id of the class it self if it
+defines the method or otherwise the id of the first super class that defines the
+method.
