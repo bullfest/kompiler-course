@@ -56,6 +56,7 @@ object Trees {
   }
 
   case class ClassDecl(id: Identifier, parent: Option[Identifier], vars: List[VarDecl], methods: List[MethodDecl]) extends Tree with Symbolic[ClassSymbol] {
+
     def collectSymbol: ClassSymbol = {
       val symbol = new ClassSymbol(id.value)
       setSymbol(symbol)
@@ -64,9 +65,9 @@ object Trees {
         val varSymbol = variable.collectSymbol
         symbol.members += (varSymbol.name -> varSymbol)
       }
-      for (meth <- methods) {
-        val methSymbol = meth.collectSymbol(symbol)
-        symbol.methods += (methSymbol.name -> methSymbol)
+      for (method <- methods) {
+        val methodSymbol = method.collectSymbol(symbol)
+        symbol.methods += (methodSymbol.name -> methodSymbol)
       }
       symbol
     }
@@ -111,7 +112,17 @@ object Trees {
     }
   }
 
-  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier, args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree], retExpr: ExprTree) extends Tree with Symbolic[MethodSymbol] {
+  case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier,
+                        args: List[Formal], vars: List[VarDecl], exprs: List[ExprTree],
+                        retExpr: ExprTree) extends Tree with Symbolic[MethodSymbol] {
+
+    def collectSymbol(cls: ClassSymbol): MethodSymbol = {
+      val symbol = new MethodSymbol(id.value, cls)
+      id.setSymbol(symbol)
+      setSymbol(symbol)
+      symbol
+    }
+
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       if (overrides)
         sb.append("override ")
@@ -146,6 +157,14 @@ object Trees {
   }
 
   sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree with Symbolic[VariableSymbol] {
+
+    def collectSymbol: VariableSymbol = {
+      val symbol = new VariableSymbol(id.value)
+      id.setSymbol(symbol)
+      setSymbol(symbol)
+      symbol
+    }
+
     override def prettyPrint(sb: StringBuilder, indent: Int): Unit = {
       sb.append(id.value).append(": ")
       tpe.prettyPrint(sb, indent)
