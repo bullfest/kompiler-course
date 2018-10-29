@@ -182,7 +182,10 @@ Note that:
   * Overriding methods have a different symbol than their overridden
     counterparts.
 
-  * Method names in method calls are unresolved symbols.
+  * For now you can let methods have unresolved symbols, as we need to
+    figure out the type of the object before we can figure out the
+    right method signature. You will attach ids to methods in the
+    next lab when we do type checking.
 
 ### Constraints
 
