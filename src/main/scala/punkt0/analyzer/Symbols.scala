@@ -13,6 +13,8 @@ object Symbols {
       this
     }
 
+    def hasSymbol: Boolean = _sym.isDefined
+
     def getSymbol: S = _sym match {
       case Some(s) => s
       case None => sys.error("Accessing undefined symbol.")
