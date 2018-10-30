@@ -65,14 +65,12 @@ object Main {
     }
 
     if (ctx.doPrintMain) {
-      val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
-      print(Printer.apply(result))
+      Lexer.andThen(Parser).andThen(Printer).run(ctx.file.get)(ctx)
       sys.exit(0)
     }
 
     if (ctx.doSymbolIds) {
-      val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
-      print(Printer.apply(result))
+      Lexer.andThen(Parser).andThen(NameAnalysis).andThen(Printer).run(ctx.file.get)(ctx)
       sys.exit(0)
     }
 
