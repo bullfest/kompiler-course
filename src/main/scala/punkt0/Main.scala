@@ -3,6 +3,7 @@ package punkt0
 import java.io.File
 
 import lexer._
+import punkt0.analyzer.NameAnalysis
 import punkt0.ast.{Parser, Printer}
 
 
@@ -30,6 +31,10 @@ object Main {
 
       case "--print" :: argsTail =>
         ctx = ctx.copy(doPrintMain = true)
+        processOption(argsTail)
+
+      case "--symid" :: argsTail =>
+        ctx = ctx.copy(doSymbolIds = true)
         processOption(argsTail)
 
       case f :: argsTail =>
@@ -61,6 +66,12 @@ object Main {
 
     if (ctx.doPrintMain) {
       val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
+      print(Printer.apply(result))
+      sys.exit(0)
+    }
+
+    if (ctx.doSymbolIds) {
+      val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
       print(Printer.apply(result))
       sys.exit(0)
     }
