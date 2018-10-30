@@ -129,6 +129,14 @@ object Trees {
       val symbol = new MethodSymbol(id.value, cls)
       id.setSymbol(symbol)
       setSymbol(symbol)
+      for (arg <- args) {
+        val argSymbol = arg.collectSymbol
+        symbol.params += (argSymbol.name -> argSymbol)
+      }
+      for (var_ <- vars) {
+        val varSymbol = var_.collectSymbol
+        symbol.members += (varSymbol.name -> varSymbol)
+      }
       symbol
     }
 
