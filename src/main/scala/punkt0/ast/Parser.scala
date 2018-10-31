@@ -281,7 +281,7 @@ object Parser extends Phase[Iterator[Token], Program] {
         token_ = currentToken
         eat(IDKIND)
       }
-      Identifier(token_.asInstanceOf[ID].value)
+      Identifier(token_.asInstanceOf[ID].value).setPos(token_)
     }
 
     def parseStrongExpression4: ExprTree = {
