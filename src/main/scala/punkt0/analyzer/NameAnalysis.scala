@@ -46,7 +46,7 @@ object NameAnalysis extends Phase[Program, Program] {
       // Don't allow classes with the same name
       globalScope.lookupClass(symbol.name) match {
         case Some(sym) =>
-          multipleDeclarationError(sym)
+          multipleDeclarationError(cls)
         case None =>
           globalScope.classes += (symbol.name -> symbol)
       }
