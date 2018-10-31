@@ -1,22 +1,82 @@
 package punkt0
 package ast
 
-import analyzer.Symbols._
+import punkt0.analyzer.NameAnalysis
+import punkt0.analyzer.Symbols._
 
 object Trees {
   val indent_length = 2
 
+  def attachSymbolsType(tpe: TypeTree, globalScope: GlobalScope): Unit = {
+    tpe match {
+      case ident: Identifier =>
+        globalScope.lookupClass(ident.value) match {
+          case Some(symbol) =>
+            ident.setSymbol(symbol)
+          case None =>
+            NameAnalysis.unrecognizedIdentError(ident)
+        }
+      case _ =>
+    }
+  }
+
   sealed trait Tree extends Positioned {
     def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit
+
+    def attachSymbols(gs: GlobalScope, classScope: ClassSymbol = null, methodScope: MethodSymbol = null): Unit = Unit
+  }
+
+  sealed trait TypeTree extends Tree
+
+  sealed trait ExprTree extends Tree
+
+  abstract sealed class BinaryOperator(lhs: ExprTree, rhs: ExprTree, operator: String) extends ExprTree {
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      lhs.attachSymbols(gs, classScope, methodScope)
+      rhs.attachSymbols(gs, classScope, methodScope)
+    }
+
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      lhs.prettyPrint(sb, indent, doSymbolIds)
+      sb.append(" " + operator + " ")
+      rhs.prettyPrint(sb, indent, doSymbolIds)
+    }
+  }
+
+  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree with Symbolic[VariableSymbol] {
+
+    def collectSymbol: VariableSymbol = {
+      val symbol = new VariableSymbol(id.value)
+      id.setSymbol(symbol)
+      setSymbol(symbol)
+      symbol
+    }
+
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      id.prettyPrint(sb, indent, doSymbolIds)
+      sb.append(": ")
+      tpe.prettyPrint(sb, indent, doSymbolIds)
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      attachSymbolsType(tpe, gs)
+    }
   }
 
   case class Program(main: MainDecl, classes: List[ClassDecl]) extends Tree {
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
       classes.foreach(c => {
-        c.prettyPrint(sb, indent, doSymbolIds); sb.append("\n\n")
+        c.prettyPrint(sb, indent, doSymbolIds)
+        sb.append("\n\n")
       })
       main.prettyPrint(sb, indent, doSymbolIds)
       sb.append("\n")
+    }
+
+    override def attachSymbols(gs: GlobalScope, classSymbol: ClassSymbol, methodSymbol: MethodSymbol): Unit = {
+      main.attachSymbols(gs)
+      classes.foreach(_.attachSymbols(gs))
     }
   }
 
@@ -56,6 +116,17 @@ object Trees {
       }
       sb.append("\n")
       sb.append(" " * indent).append("}")
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      gs.lookupClass(parent.value) match {
+        case Some(symbol) =>
+          parent.setSymbol(symbol)
+          getSymbol.parent = Some(symbol)
+        case None => NameAnalysis.unrecognizedIdentError(parent)
+      }
+      vars.foreach(_.attachSymbols(gs, getSymbol))
+      exprs.foreach(_.attachSymbols(gs, getSymbol))
     }
   }
 
@@ -99,6 +170,22 @@ object Trees {
       }
       sb.append(" " * indent).append("}")
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      parent match {
+        case Some(parent_) =>
+          gs.lookupClass(parent_.value) match {
+            case Some(symbol) =>
+              parent_.setSymbol(symbol)
+              getSymbol.parent = Some(symbol)
+            case None => NameAnalysis.unrecognizedIdentError(parent_)
+          }
+        case None =>
+      }
+
+      vars.foreach(_.attachSymbols(gs, getSymbol))
+      methods.foreach(_.attachSymbols(gs, getSymbol))
+    }
   }
 
   case class VarDecl(tpe: TypeTree, id: Identifier, expr: ExprTree) extends Tree with Symbolic[VariableSymbol] {
@@ -119,6 +206,34 @@ object Trees {
       expr.prettyPrint(sb, indent, doSymbolIds)
       sb.append(";")
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      attachSymbolsType(tpe, gs)
+      expr.attachSymbols(gs, classScope, methodScope)
+    }
+  }
+
+  case class BooleanType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      sb.append("Boolean")
+    }
+  }
+
+  case class IntType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      sb.append("Int")
+    }
+  }
+
+  case class StringType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      sb.append("String")
+    }
+  }
+
+  case class UnitType() extends TypeTree {
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit =
+      sb.append("Unit")
   }
 
   case class MethodDecl(overrides: Boolean, retType: TypeTree, id: Identifier,
@@ -173,68 +288,47 @@ object Trees {
       sb.append("\n")
       sb.append(" " * indent).append("}")
     }
-  }
 
-  sealed case class Formal(tpe: TypeTree, id: Identifier) extends Tree with Symbolic[VariableSymbol] {
-
-    def collectSymbol: VariableSymbol = {
-      val symbol = new VariableSymbol(id.value)
-      id.setSymbol(symbol)
-      setSymbol(symbol)
-      symbol
-    }
-
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      id.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(": ")
-      tpe.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  sealed trait TypeTree extends Tree
-
-  case class BooleanType() extends TypeTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      sb.append("Boolean")
-    }
-  }
-
-  case class IntType() extends TypeTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      sb.append("Int")
-    }
-  }
-
-  case class StringType() extends TypeTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      sb.append("String")
-    }
-  }
-
-  case class UnitType() extends TypeTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit =
-      sb.append("Unit")
-  }
-
-
-  sealed trait ExprTree extends Tree
-
-  abstract sealed class BinaryOperator(lhs: ExprTree, rhs: ExprTree, operator: String) extends ExprTree {
-
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" " + operator + " ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      classScope.parent match {
+        case Some(parent_) =>
+          parent_.lookupMethod(id.value) match {
+            case Some(_) =>
+              if (!overrides) {
+                NameAnalysis.illegalOverrideError(this)
+              }
+            case None =>
+              if (overrides) {
+                NameAnalysis.missingSuperMethodError(this)
+              }
+          }
+        case None =>
+          if (overrides) {
+            NameAnalysis.missingSuperMethodError(this)
+          }
+      }
+      attachSymbolsType(retType, gs)
+      args.foreach(_.attachSymbols(gs))
+      vars.foreach(_.attachSymbols(gs, classScope, getSymbol))
+      exprs.foreach(_.attachSymbols(gs, classScope, getSymbol))
+      retExpr.attachSymbols(gs, classScope, getSymbol)
     }
   }
 
   case class And(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "&&")
+
   case class Or(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "||")
+
   case class Plus(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "+")
+
   case class Minus(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "-")
+
   case class Times(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "*")
+
   case class Div(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "/")
+
   case class LessThan(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "<")
+
   case class Equals(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "==")
 
   case class MethodCall(obj: ExprTree, meth: Identifier, args: List[ExprTree]) extends ExprTree {
@@ -251,6 +345,12 @@ object Trees {
         }
       }
       sb.append(")")
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      obj.attachSymbols(gs, classScope, methodScope)
+      // meth.attachSymbols(gs, obj.type.getSymbol) // TODO when typechecking is implemented
+      args.foreach(_.attachSymbols(gs, classScope, methodScope))
     }
   }
 
@@ -281,11 +381,51 @@ object Trees {
         sb.append('#').append(if (hasSymbol) getSymbol.id else "??")
       }
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      if (methodScope != null) {
+        methodScope.lookupVar(value) match {
+          case Some(symbol) =>
+            setSymbol(symbol)
+          case None =>
+            NameAnalysis.unrecognizedIdentError(this)
+        }
+        return
+      } else if (classScope != null) {
+        classScope.lookupVar(value) match {
+          case Some(symbol) =>
+            setSymbol(symbol)
+          case None =>
+            NameAnalysis.unrecognizedIdentError(this)
+        }
+        return
+      }
+      // throw real error with stacktrace
+      sys.error("Bad scope")
+    }
   }
 
   case class This() extends ExprTree with Symbolic[ClassSymbol] {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit =
-      sb.append("this")
+    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
+      if (doSymbolIds) {
+        sb.append("this#")
+        if (hasSymbol) {
+          sb.append(getSymbol.name).append("#").append(getSymbol.id)
+        } else {
+          sb.append("??")
+        }
+      } else {
+        sb.append("this")
+      }
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      if (classScope != null) {
+        setSymbol(classScope)
+        return
+      }
+      sys.error("Bad scope")
+    }
   }
 
   case class Null() extends ExprTree {
@@ -299,12 +439,20 @@ object Trees {
       tpe.prettyPrint(sb, indent, doSymbolIds)
       sb.append("()")
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      attachSymbolsType(tpe, gs)
+    }
   }
 
   case class Not(expr: ExprTree) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
       sb.append("!")
       expr.prettyPrint(sb, indent, doSymbolIds)
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      expr.attachSymbols(gs, classScope, methodScope)
     }
   }
 
@@ -326,12 +474,16 @@ object Trees {
         sb.append(" " * indent).append("}")
       }
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      exprs.foreach(_.attachSymbols(gs, classScope, methodScope))
+    }
   }
 
-  case class If(expr: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree {
+  case class If(cond: ExprTree, thn: ExprTree, els: Option[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
       sb.append("if (")
-      expr.prettyPrint(sb, indent, doSymbolIds)
+      cond.prettyPrint(sb, indent, doSymbolIds)
       sb.append(") ")
       val indent2 = indent + indent_length
       if (thn.isInstanceOf[Block]) {
@@ -354,6 +506,16 @@ object Trees {
         case None => Unit
       }
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      cond.attachSymbols(gs, classScope, methodScope)
+      thn.attachSymbols(gs, classScope, methodScope)
+      els match {
+        case Some(els_) =>
+          els_.attachSymbols(gs, classScope, methodScope)
+        case None =>
+      }
+    }
   }
 
   case class While(cond: ExprTree, body: ExprTree) extends ExprTree {
@@ -370,6 +532,11 @@ object Trees {
         body.prettyPrint(sb, indent2, doSymbolIds)
       }
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      cond.attachSymbols(gs, classScope, methodScope)
+      body.attachSymbols(gs, classScope, methodScope)
+    }
   }
 
   case class Println(expr: ExprTree) extends ExprTree {
@@ -378,6 +545,10 @@ object Trees {
       expr.prettyPrint(sb, indent, doSymbolIds)
       sb.append(")")
     }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      expr.attachSymbols(gs, classScope, methodScope)
+    }
   }
 
   case class Assign(id: Identifier, expr: ExprTree) extends ExprTree {
@@ -385,6 +556,11 @@ object Trees {
       id.prettyPrint(sb, indent, doSymbolIds)
       sb.append(" = ")
       expr.prettyPrint(sb, indent, doSymbolIds)
+    }
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      id.attachSymbols(gs, classScope, methodScope)
+      expr.attachSymbols(gs, classScope, methodScope)
     }
   }
 
