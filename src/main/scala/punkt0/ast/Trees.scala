@@ -228,6 +228,20 @@ object Trees {
     }
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      if (methodScope == null) {
+        //It's a class variable
+        if (classScope == null)
+          sys.error("Bad scope")
+        classScope.parent match {
+          case Some(parent) =>
+            parent.lookupVar(id.value) match {
+              case Some(value) =>
+                NameAnalysis.multipleDeclarationError(id)
+              case None =>
+            }
+          case None =>
+        }
+      }
       attachSymbolsType(tpe, gs)
       expr.attachSymbols(gs, classScope, methodScope)
     }
