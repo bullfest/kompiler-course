@@ -33,6 +33,8 @@ to detect the following kinds or errors:
   * a method is overloaded (forbidden in Punkt0)
   * a method argument is shadowed by a local variable declaration
     (forbidden in Java, and we follow this convention)
+  * a method argument is reassigned (in Scala method parameters are val
+    and although we do not have val in punkt0 we will follow this convention)
   * two method arguments have the same name
   * a class name is used as a symbol (as parent class or type, for
     instance), but is not declared
@@ -204,6 +206,8 @@ catch):
     modifying your parser to incorporate this restriction. (An
     alternative is to enforce this constraint directly in the name
     analyzer.)
+  * method parameters can not be reassigned. I.e. they can not occur
+    as left hand side of an assignment
 
 #### Shadowing
 
