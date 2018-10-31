@@ -88,7 +88,12 @@ object Trees {
       obj.setSymbol(symbol)
       for (variable <- vars) {
         val varSymbol = variable.collectSymbol
-        symbol.members += (varSymbol.name -> varSymbol)
+        symbol.members.get(varSymbol.name) match {
+          case Some(_) =>
+            NameAnalysis.multipleDeclarationError(variable)
+          case None =>
+            symbol.members += (varSymbol.name -> varSymbol)
+        }
       }
       symbol
     }
@@ -138,11 +143,26 @@ object Trees {
       id.setSymbol(symbol)
       for (variable <- vars) {
         val varSymbol = variable.collectSymbol
-        symbol.members += (varSymbol.name -> varSymbol)
+        symbol.lookupVar(varSymbol.name) match {
+          case Some(_) =>
+            NameAnalysis.multipleDeclarationError(variable)
+          case None =>
+            symbol.members += (varSymbol.name -> varSymbol)
+        }
       }
       for (method <- methods) {
         val methodSymbol = method.collectSymbol(symbol)
-        symbol.methods += (methodSymbol.name -> methodSymbol)
+        symbol.lookupMethod(symbol.name) match {
+          case Some(_) =>
+            NameAnalysis.multipleDeclarationError(method)
+          case None =>
+            symbol.lookupVar(symbol.name) match {
+              case Some(_) =>
+                NameAnalysis.multipleDeclarationError(method)
+              case None =>
+                symbol.methods += (methodSymbol.name -> methodSymbol)
+            }
+        }
       }
       symbol
     }
@@ -246,11 +266,26 @@ object Trees {
       setSymbol(symbol)
       for (arg <- args) {
         val argSymbol = arg.collectSymbol
-        symbol.params += (argSymbol.name -> argSymbol)
+        symbol.params.get(argSymbol.name) match {
+          case Some(_) =>
+            NameAnalysis.multipleDeclarationError(arg)
+          case None =>
+            symbol.params += (argSymbol.name -> argSymbol)
+        }
       }
       for (var_ <- vars) {
         val varSymbol = var_.collectSymbol
-        symbol.members += (varSymbol.name -> varSymbol)
+        symbol.params.get(varSymbol.name) match {
+          case Some(_) =>
+            NameAnalysis.multipleDeclarationError(var_)
+          case None =>
+            symbol.members.get(varSymbol.name) match {
+              case Some(_) =>
+                NameAnalysis.multipleDeclarationError(var_)
+              case None =>
+                symbol.members += (varSymbol.name -> varSymbol)
+            }
+        }
       }
       symbol
     }
@@ -293,9 +328,13 @@ object Trees {
       classScope.parent match {
         case Some(parent_) =>
           parent_.lookupMethod(id.value) match {
-            case Some(_) =>
+            case Some(otherMethod) =>
               if (!overrides) {
                 NameAnalysis.illegalOverrideError(this)
+              } else {
+                if (otherMethod.params.size != getSymbol.params.size) {
+                  NameAnalysis.nonMatchingParamsError(this)
+                }
               }
             case None =>
               if (overrides) {
