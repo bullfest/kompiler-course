@@ -219,69 +219,23 @@ object Trees {
 
   sealed trait ExprTree extends Tree
 
-  case class And(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
+  abstract sealed class BinaryOperator(lhs: ExprTree, rhs: ExprTree, operator: String) extends ExprTree {
+
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
       lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" && ")
+      sb.append(" " + operator + " ")
       rhs.prettyPrint(sb, indent, doSymbolIds)
     }
   }
 
-  case class Or(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" || ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class Plus(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" + ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class Minus(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" - ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class Times(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" * ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class Div(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" / ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class LessThan(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" < ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
-
-  case class Equals(lhs: ExprTree, rhs: ExprTree) extends ExprTree {
-    override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
-      lhs.prettyPrint(sb, indent, doSymbolIds)
-      sb.append(" == ")
-      rhs.prettyPrint(sb, indent, doSymbolIds)
-    }
-  }
+  case class And(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "&&")
+  case class Or(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "||")
+  case class Plus(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "+")
+  case class Minus(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "-")
+  case class Times(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "*")
+  case class Div(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "/")
+  case class LessThan(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "<")
+  case class Equals(lhs: ExprTree, rhs: ExprTree) extends BinaryOperator(lhs, rhs, "==")
 
   case class MethodCall(obj: ExprTree, meth: Identifier, args: List[ExprTree]) extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit = {
