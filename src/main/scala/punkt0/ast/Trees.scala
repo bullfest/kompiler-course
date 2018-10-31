@@ -614,7 +614,12 @@ object Trees {
     }
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
-      id.attachSymbols(gs, classScope, methodScope)
+      methodScope.lookupWriteableVar(id.value) match {
+        case Some(symbol) =>
+          id.setSymbol(symbol)
+        case None =>
+          NameAnalysis.assignmentIdentNotFoundError(id)
+      }
       expr.attachSymbols(gs, classScope, methodScope)
     }
   }

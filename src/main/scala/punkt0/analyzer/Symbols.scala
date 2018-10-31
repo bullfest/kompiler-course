@@ -91,6 +91,16 @@ object Symbols {
           case None => classSymbol.lookupVar(n)
         }
     }
+
+    /**
+      * Finds variables that can be written to (not val/parameter)
+      * @return VariableSymbol representing the variable or None if no such variable is found
+      */
+    def lookupWriteableVar(n: String): Option[VariableSymbol] = members.get(n) match {
+      case v @ Some(_) => v
+      case None =>
+        classSymbol.lookupVar(n)
+    }
   }
 
   class VariableSymbol(val name: String) extends Symbol

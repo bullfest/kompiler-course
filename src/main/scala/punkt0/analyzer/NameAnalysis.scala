@@ -4,6 +4,11 @@ package analyzer
 import punkt0.ast.Trees._
 
 object NameAnalysis extends Phase[Program, Program] {
+  def assignmentIdentNotFoundError(pos: Positioned): Unit = {
+    // Don't terminate, these errors shouldn't really affect each other
+    Reporter.error("Identifier not found or is not assignable", pos)
+  }
+
   def inheritanceCycleError(pos: Positioned): Unit = {
     // Don't terminate, these errors shouldn't really affect each other
     Reporter.error("Superclass is a subclass of this class", pos)
