@@ -139,7 +139,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       eat(COLON)
       val type_ = parseType
       eat(EQSIGN)
-      val expr = parseExpression
+      val expr = parseCreation
       eat(SEMICOLON)
       VarDecl(type_, id, expr).setPos(id)
     }
@@ -171,18 +171,6 @@ object Parser extends Phase[Iterator[Token], Program] {
       val thisToken = currentToken
 
       var tree: ExprTree = currentToken.kind match {
-        case INTLITKIND =>
-          eat(INTLITKIND)
-          IntLit(thisToken.asInstanceOf[INTLIT].value)
-        case STRLITKIND =>
-          eat(STRLITKIND)
-          StringLit(thisToken.asInstanceOf[STRLIT].value)
-        case TRUE =>
-          eat(TRUE)
-          True()
-        case FALSE =>
-          eat(FALSE)
-          False()
         case IDKIND =>
           val identifier = parseIdentifier()
           if (currentToken.kind == EQSIGN) {
@@ -194,14 +182,6 @@ object Parser extends Phase[Iterator[Token], Program] {
         case THIS =>
           eat(THIS)
           This()
-        case NULL =>
-          eat(NULL)
-          Null()
-        case NEW =>
-          eat(NEW)
-          val identifier = parseIdentifier()
-          eatTokenSequence(List(LPAREN, RPAREN))
-          New(identifier)
         case BANG =>
           eat(BANG)
           Not(parseWeakExpression)
@@ -246,6 +226,8 @@ object Parser extends Phase[Iterator[Token], Program] {
           val expr = parseExpression
           eat(RPAREN)
           Println(expr)
+        case INTLITKIND | STRLITKIND | TRUE | FALSE | NULL | NEW =>
+          parseCreation
         case _ =>
           expected(
             INTLITKIND, STRLITKIND, TRUE, FALSE, IDKIND, THIS,
@@ -282,6 +264,36 @@ object Parser extends Phase[Iterator[Token], Program] {
         eat(IDKIND)
       }
       Identifier(token_.asInstanceOf[ID].value).setPos(token_)
+    }
+
+    def parseCreation: ExprTree = {
+      val thisToken = currentToken
+      currentToken.kind match {
+        case INTLITKIND =>
+          eat(INTLITKIND)
+          IntLit(thisToken.asInstanceOf[INTLIT].value)
+        case STRLITKIND =>
+          eat(STRLITKIND)
+          StringLit(thisToken.asInstanceOf[STRLIT].value)
+        case TRUE =>
+          eat(TRUE)
+          True()
+        case FALSE =>
+          eat(FALSE)
+          False()
+        case NULL =>
+          eat(NULL)
+          Null()
+        case NEW =>
+          eat(NEW)
+          val identifier = parseIdentifier()
+          eatTokenSequence(List(LPAREN, RPAREN))
+          New(identifier)
+        case _ =>
+          expected(
+            INTLITKIND, STRLITKIND, TRUE, FALSE, NULL, NEW
+          )
+      }
     }
 
     def parseStrongExpression4: ExprTree = {

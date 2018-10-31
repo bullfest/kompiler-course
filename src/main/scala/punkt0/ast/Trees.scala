@@ -237,7 +237,7 @@ object Trees {
         classScope.parent match {
           case Some(parent) =>
             parent.lookupVar(id.value) match {
-              case Some(value) =>
+              case Some(_) =>
                 NameAnalysis.multipleDeclarationError(id)
               case None =>
             }
