@@ -87,6 +87,6 @@ object Main {
   def main(args: Array[String]): Unit = {
     val ctx = processOptions(args)
 
-    val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
+    val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
   }
 }
