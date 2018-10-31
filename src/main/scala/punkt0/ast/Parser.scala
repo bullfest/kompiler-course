@@ -139,7 +139,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       eat(COLON)
       val type_ = parseType
       eat(EQSIGN)
-      val expr = parseCreation
+      val expr = parseConstant
       eat(SEMICOLON)
       VarDecl(type_, id, expr).setPos(id)
     }
@@ -179,9 +179,6 @@ object Parser extends Phase[Iterator[Token], Program] {
             Assign(identifier, parseExpression)
           } else // ident
             identifier
-        case THIS =>
-          eat(THIS)
-          This()
         case BANG =>
           eat(BANG)
           Not(parseWeakExpression)
@@ -226,8 +223,8 @@ object Parser extends Phase[Iterator[Token], Program] {
           val expr = parseExpression
           eat(RPAREN)
           Println(expr)
-        case INTLITKIND | STRLITKIND | TRUE | FALSE | NULL | NEW =>
-          parseCreation
+        case INTLITKIND | STRLITKIND | TRUE | FALSE | NULL | THIS | NEW =>
+          parseConstant
         case _ =>
           expected(
             INTLITKIND, STRLITKIND, TRUE, FALSE, IDKIND, THIS,
@@ -266,7 +263,7 @@ object Parser extends Phase[Iterator[Token], Program] {
       Identifier(token_.asInstanceOf[ID].value).setPos(token_)
     }
 
-    def parseCreation: ExprTree = {
+    def parseConstant: ExprTree = {
       val thisToken = currentToken
       currentToken.kind match {
         case INTLITKIND =>
@@ -284,6 +281,9 @@ object Parser extends Phase[Iterator[Token], Program] {
         case NULL =>
           eat(NULL)
           Null()
+        case THIS =>
+          eat(THIS)
+          This()
         case NEW =>
           eat(NEW)
           val identifier = parseIdentifier()
@@ -291,7 +291,7 @@ object Parser extends Phase[Iterator[Token], Program] {
           New(identifier)
         case _ =>
           expected(
-            INTLITKIND, STRLITKIND, TRUE, FALSE, NULL, NEW
+            INTLITKIND, STRLITKIND, TRUE, FALSE, NULL, THIS, NEW
           )
       }
     }
