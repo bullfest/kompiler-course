@@ -4,6 +4,11 @@ package analyzer
 import punkt0.ast.Trees._
 
 object NameAnalysis extends Phase[Program, Program] {
+  def inheritanceCycleError(pos: Positioned): Unit = {
+    // Don't terminate, these errors shouldn't really affect each other
+    Reporter.error("Superclass is a subclass of this class", pos)
+  }
+
   def nonMatchingParamsError(pos: Positioned): Unit = {
     // Don't terminate, these errors shouldn't really affect each other
     Reporter.error("Overridden method does not have matching parameters", pos)

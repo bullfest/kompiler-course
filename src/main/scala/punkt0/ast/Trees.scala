@@ -202,6 +202,8 @@ object Trees {
           }
         case None =>
       }
+      if (getSymbol.isSubclassOf(getSymbol.name))
+        NameAnalysis.inheritanceCycleError(this)
 
       vars.foreach(_.attachSymbols(gs, getSymbol))
       methods.foreach(_.attachSymbols(gs, getSymbol))

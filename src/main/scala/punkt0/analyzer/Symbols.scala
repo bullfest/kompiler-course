@@ -63,6 +63,19 @@ object Symbols {
         case None => None
       }
     }
+
+    def isSubclassOf(className: String): Boolean = {
+      parent match {
+        case Some(parent_) =>
+          if (parent_.name == className)
+            true
+          else
+            parent_.isSubclassOf(className)
+        case None =>
+          false
+      }
+    }
+
   }
 
   class MethodSymbol(val name: String, val classSymbol: ClassSymbol) extends Symbol {
