@@ -128,7 +128,11 @@ object Trees {
         case Some(symbol) =>
           parent.setSymbol(symbol)
           getSymbol.parent = Some(symbol)
-        case None => NameAnalysis.unrecognizedIdentError(parent)
+        case None =>
+          if (parent.value == "App")
+            Unit // YOLO
+          else
+            NameAnalysis.unrecognizedIdentError(parent)
       }
       vars.foreach(_.attachSymbols(gs, getSymbol))
       exprs.foreach(_.attachSymbols(gs, getSymbol))
