@@ -1,9 +1,9 @@
 package punkt0
 package analyzer
 
-import scala.collection.mutable
+import punkt0.analyzer.Types._
 
-import Types._
+import scala.collection.mutable
 
 object Symbols {
 
@@ -67,15 +67,15 @@ object Symbols {
     }
 
     def isSubclassOf(className: String): Boolean = {
-      parent match {
-        case Some(parent_) =>
-          if (parent_.name == className)
-            true
-          else
+      if (className == name || className == "AnyRef") //All classes subclass AnyRef
+        true
+      else
+        parent match {
+          case Some(parent_) =>
             parent_.isSubclassOf(className)
-        case None =>
-          false
-      }
+          case None =>
+            false
+        }
     }
 
   }

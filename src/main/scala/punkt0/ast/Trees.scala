@@ -1,9 +1,9 @@
 package punkt0
 package ast
 
-import analyzer.NameAnalysis
-import analyzer.Symbols._
-import analyzer.Types._
+import punkt0.analyzer.NameAnalysis
+import punkt0.analyzer.Symbols._
+import punkt0.analyzer.Types._
 
 object Trees {
   val indent_length = 2
@@ -200,15 +200,16 @@ object Trees {
       parent match {
         case Some(parent_) =>
           gs.lookupClass(parent_.value) match {
-            case Some(symbol) =>
-              parent_.setSymbol(symbol)
-              getSymbol.parent = Some(symbol)
+            case Some(parentSymbol) =>
+              parent_.setSymbol(parentSymbol)
+              getSymbol.parent = Some(parentSymbol)
+
+              if (parentSymbol.isSubclassOf(getSymbol.name)) // Check for circular dependency
+                NameAnalysis.inheritanceCycleError(this)
             case None => NameAnalysis.unrecognizedIdentError(parent_)
           }
         case None =>
       }
-      if (getSymbol.isSubclassOf(getSymbol.name))
-        NameAnalysis.inheritanceCycleError(this)
 
       vars.foreach(_.attachSymbols(gs, getSymbol))
       methods.foreach(_.attachSymbols(gs, getSymbol))
