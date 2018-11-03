@@ -3,7 +3,7 @@ package punkt0
 import java.io.File
 
 import lexer._
-import punkt0.analyzer.NameAnalysis
+import punkt0.analyzer.{NameAnalysis, TypedASTPrinter}
 import punkt0.ast.{Parser, Printer}
 
 
@@ -23,6 +23,10 @@ object Main {
 
       case "--tokens" :: argsTail =>
         ctx = ctx.copy(doTokens = true)
+        processOption(argsTail)
+
+      case "--ast+" :: argsTail =>
+        ctx = ctx.copy(doASTPlus = true)
         processOption(argsTail)
 
       case "--ast" :: argsTail =>
@@ -61,6 +65,12 @@ object Main {
     if (ctx.doAST) {
       val result = Lexer.andThen(Parser).run(ctx.file.get)(ctx)
       print(result)
+      sys.exit(0)
+    }
+
+    if (ctx.doASTPlus) {
+      val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
+      print(TypedASTPrinter.apply(result))
       sys.exit(0)
     }
 

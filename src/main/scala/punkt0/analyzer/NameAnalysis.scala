@@ -19,7 +19,6 @@ object NameAnalysis extends Phase[Program, Program] {
     Reporter.error("Overridden method does not have matching parameters", pos)
   }
 
-
   def unrecognizedIdentError(pos: Positioned): Unit = {
     // Don't terminate, these errors shouldn't really affect each other
     Reporter.error("Unrecognized identifier", pos)
@@ -50,7 +49,7 @@ object NameAnalysis extends Phase[Program, Program] {
       val symbol = cls.collectSymbol
       // Don't allow classes with the same name
       globalScope.lookupClass(symbol.name) match {
-        case Some(sym) =>
+        case Some(_) =>
           multipleDeclarationError(cls)
         case None =>
           globalScope.classes += (symbol.name -> symbol)
