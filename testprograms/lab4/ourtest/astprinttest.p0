@@ -1,0 +1,9 @@
+class Fact {
+    var fah: Int = 2;
+}
+
+object Main extends App {
+    var fah: Int = 2;
+    println("f" + "oo" == "fo" + "o");
+    println(new Fact() == new Fact())
+}
