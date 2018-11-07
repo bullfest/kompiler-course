@@ -27,7 +27,22 @@ object Trees {
     def attachSymbols(gs: GlobalScope, classScope: ClassSymbol = null, methodScope: MethodSymbol = null): Unit = Unit
   }
 
-  sealed trait TypeTree extends Tree with Typed
+  sealed trait TypeTree extends Tree with Typed {
+    override def getType: Type = {
+      this match {
+        case BooleanType() =>
+          TBoolean
+        case IntType() =>
+          TInt
+        case StringType() =>
+          TString
+        case UnitType() =>
+          TUnit
+        case i: Identifier =>
+          TClass(i.getSymbol.asInstanceOf[ClassSymbol])
+      }
+    }
+  }
 
   sealed trait ExprTree extends Tree with Typed
 
@@ -476,7 +491,8 @@ object Trees {
       case vs: VariableSymbol =>
         vs.getType
     }
-    override def setType(tpe: Type) = this
+
+    override def setType(tpe: Type): this.type = this
   }
 
   case class This() extends ExprTree with Symbolic[ClassSymbol] {
