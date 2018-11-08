@@ -77,7 +77,10 @@ object TypeChecking extends Phase[Program, Program] {
         case New(tpe) =>
           tpe.getType
         case Not(expr) =>
+          tcExpr(expr, TBoolean)
+          TBoolean
         case Block(exprs) =>
+          
         case If(cond, thn, els) =>
         case While(cond, body) =>
         case Println(expr) =>
