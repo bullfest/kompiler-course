@@ -147,7 +147,7 @@ object Trees {
           getSymbol.parent = Some(symbol)
         case None =>
           if (parent.value == "App")
-            Unit // YOLO
+            parent.setSymbol(new ClassSymbol("App")) // YOLO
           else
             NameAnalysis.unrecognizedIdentError(parent)
       }
