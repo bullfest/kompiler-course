@@ -29,6 +29,9 @@ object TypeChecking extends Phase[Program, Program] {
       case m@MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
         if (overrides) {
           val overriddenMethod = m.getSymbol.classSymbol.parent.get.lookupMethod(id.value).get
+          if (!(overriddenMethod.params.values, m.getSymbol.params.values).zipped.forall(_.getType == _.getType))
+            NameAnalysis.nonMatchingParamsError(m) //Has to be done here as all param types has to be assigned
+
           if (overriddenMethod.getType != retType.getType)
             Reporter.error("Return type does not match overridden method", m)
         }
