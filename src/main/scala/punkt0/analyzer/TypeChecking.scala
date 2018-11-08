@@ -80,7 +80,11 @@ object TypeChecking extends Phase[Program, Program] {
           tcExpr(expr, TBoolean)
           TBoolean
         case Block(exprs) =>
-          
+          var lastType: Type = null
+          for (e <- exprs) {
+            lastType = tcExpr(e)
+          }
+          lastType
         case If(cond, thn, els) =>
         case While(cond, body) =>
         case Println(expr) =>
