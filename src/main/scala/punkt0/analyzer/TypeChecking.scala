@@ -33,6 +33,9 @@ object TypeChecking extends Phase[Program, Program] {
           tcExpr(rhs, TBoolean)
           TBoolean
         case Or(lhs, rhs) =>
+          tcExpr(lhs, TBoolean)
+          tcExpr(rhs, TBoolean)
+          TBoolean
         case Minus(lhs, rhs) =>
         case Times(lhs, rhs) =>
         case Div(lhs, rhs) =>
