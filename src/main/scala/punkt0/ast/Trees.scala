@@ -77,6 +77,7 @@ object Trees {
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
       attachSymbolsType(tpe, gs)
+      getSymbol.setType(tpe.getType)
     }
   }
 
@@ -267,6 +268,7 @@ object Trees {
       }
       attachSymbolsType(tpe, gs)
       expr.attachSymbols(gs, classScope, methodScope)
+      getSymbol.setType(tpe.getType)
     }
   }
 
@@ -384,6 +386,7 @@ object Trees {
           }
       }
       attachSymbolsType(retType, gs)
+      getSymbol.setType(retType.getType)
       args.foreach(_.attachSymbols(gs))
       vars.foreach(_.attachSymbols(gs, classScope, getSymbol))
       exprs.foreach(_.attachSymbols(gs, classScope, getSymbol))
@@ -425,7 +428,6 @@ object Trees {
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
       obj.attachSymbols(gs, classScope, methodScope)
-      // meth.attachSymbols(gs, obj.type.getSymbol) // TODO when typechecking is implemented
       args.foreach(_.attachSymbols(gs, classScope, methodScope))
     }
   }
@@ -485,7 +487,7 @@ object Trees {
       case cs: ClassSymbol =>
         TClass(cs)
 
-      case ms: MethodSymbol =>
+      case _: MethodSymbol =>
         sys.error("Requesting type of a method identifier.")
 
       case vs: VariableSymbol =>
