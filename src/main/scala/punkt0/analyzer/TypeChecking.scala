@@ -86,6 +86,20 @@ object TypeChecking extends Phase[Program, Program] {
           }
           lastType
         case If(cond, thn, els) =>
+          tcExpr(cond, TBoolean)
+          val t1 = tcExpr(thn)
+          els match {
+            case Some(els_) =>
+              val t2 = tcExpr(els_)
+              if (t1.isSubTypeOf(t2))
+                t2
+              else if (t2.isSubTypeOf(t1))
+                t1
+              else
+                TError
+            case None =>
+              TUnit
+          }
         case While(cond, body) =>
           tcExpr(cond, TBoolean)
           tcExpr(body, TUnit)
