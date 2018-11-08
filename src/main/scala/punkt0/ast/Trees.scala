@@ -505,6 +505,10 @@ object Trees {
   case class Null() extends ExprTree {
     override def prettyPrint(sb: StringBuilder, indent: Int, doSymbolIds: Boolean): Unit =
       sb.append("null")
+
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+      setType(TNull)
+    }
   }
 
   case class New(tpe: Identifier) extends ExprTree {

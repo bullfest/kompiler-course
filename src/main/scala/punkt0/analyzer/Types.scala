@@ -28,6 +28,7 @@ object Types {
   case class TClass(classSymbol: ClassSymbol) extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = {
       tpe match {
+        case TNull => true
         case TClass(otherClassSymbol) =>
           classSymbol.isSubclassOf(otherClassSymbol.name)
         case _ => false
@@ -83,5 +84,14 @@ object Types {
     }
 
     override def toString: String = "Unit"
+  }
+
+  case object TNull extends Type {
+    override def isSubTypeOf(tpe: Type): Boolean = tpe match {
+      case TNull => true
+      case _ => false
+    }
+
+    override def toString: String = "Null"
   }
 }
