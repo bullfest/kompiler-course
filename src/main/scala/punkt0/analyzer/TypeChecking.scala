@@ -11,9 +11,49 @@ object TypeChecking extends Phase[Program, Program] {
   /** Typechecking does not produce a value, but has the side effect of
    * attaching types to trees and potentially outputting error messages. */
   def run(prog: Program)(ctx: Context): Program = {
-    def tcExpr(expr: ExprTree, expected: Type*): Type = {
-      val tpe: Type = ??? // TODO: Compute type for each kind of expression
 
+    def tcOperator(operator: BinaryOperator): Type = {
+      operator match {
+        case Plus(lhs, rhs) =>
+          val t1 = tcExpr(lhs, TInt, TString)
+          val t2 = tcExpr(rhs, TInt, TString)
+          if (t1 == TString || t2 == TString)
+            TString
+          else
+            TInt
+        case Equals(lhs, rhs) =>
+        case And(lhs, rhs) =>
+        case Or(lhs, rhs) =>
+        case Minus(lhs, rhs) =>
+        case Times(lhs, rhs) =>
+        case Div(lhs, rhs) =>
+        case LessThan(lhs, rhs) =>
+      }
+    }
+
+    def tcExpr(expr: ExprTree, expected: Type*): Type = {
+      val tpe: Type = expr match {
+        case operator: BinaryOperator =>
+          tcOperator(operator)
+        case MethodCall(obj, meth, args) =>
+        case IntLit(value) =>
+        case StringLit(value) =>
+        case True() =>
+        case False() =>
+        case Identifier(value) =>
+        case This() =>
+        case Null() =>
+        case New(tpe) =>
+        case Not(expr) =>
+        case Block(exprs) =>
+        case If(cond, thn, els) =>
+        case While(cond, body) =>
+        case Println(expr) =>
+        case Assign(id, expr) =>
+
+
+      }
+      expr.setType(tpe)
 
       // Check result and return a valid type in case of error
       if (expected.isEmpty) {
