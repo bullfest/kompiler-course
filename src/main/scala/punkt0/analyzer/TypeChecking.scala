@@ -45,6 +45,9 @@ object TypeChecking extends Phase[Program, Program] {
           tcExpr(rhs, TInt)
           TInt
         case Div(lhs, rhs) =>
+          tcExpr(lhs, TInt)
+          tcExpr(rhs, TInt)
+          TInt
         case LessThan(lhs, rhs) =>
       }
     }
