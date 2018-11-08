@@ -61,13 +61,21 @@ object TypeChecking extends Phase[Program, Program] {
           tcOperator(operator)
         case MethodCall(obj, meth, args) =>
         case IntLit(value) =>
+          TInt
         case StringLit(value) =>
+          TString
         case True() =>
+          TBoolean
         case False() =>
-        case Identifier(value) =>
-        case This() =>
+          TBoolean
+        case i: Identifier =>
+          i.getType
+        case t: This =>
+          t.getSymbol.getType
         case Null() =>
+          TNull
         case New(tpe) =>
+          tpe.getType
         case Not(expr) =>
         case Block(exprs) =>
         case If(cond, thn, els) =>
