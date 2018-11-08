@@ -87,10 +87,11 @@ object TypeChecking extends Phase[Program, Program] {
           lastType
         case If(cond, thn, els) =>
         case While(cond, body) =>
+          tcExpr(cond, TBoolean)
+          tcExpr(body, TUnit)
+          TUnit
         case Println(expr) =>
         case Assign(id, expr) =>
-
-
       }
       expr.setType(tpe)
 
