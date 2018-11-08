@@ -371,7 +371,8 @@ object Trees {
               if (!overrides) {
                 NameAnalysis.illegalOverrideError(this)
               } else {
-                if (otherMethod.params.size != getSymbol.params.size) {
+                if (otherMethod.params.size != getSymbol.params.size ||
+                  !(otherMethod.params.values, getSymbol.params.values).zipped.forall(_.getType == _.getType)) {
                   NameAnalysis.nonMatchingParamsError(this)
                 }
               }
