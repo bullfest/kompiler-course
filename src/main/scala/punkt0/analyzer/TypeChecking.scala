@@ -26,7 +26,16 @@ object TypeChecking extends Phase[Program, Program] {
         methods.foreach(tcTree)
       case VarDecl(tpe, id, expr) =>
         tcExpr(expr, tpe.getType)
-      case MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
+      case m@MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
+        if (overrides) {
+          val overriddenMethod = m.getSymbol.classSymbol.parent.get.lookupMethod(id.value).get
+          if (overriddenMethod.getType != retType.getType)
+            Reporter.error("Return type does not match overridden method", m)
+        }
+        vars.foreach(tcTree)
+        exprs.foreach(tcExpr(_))
+        if (!tcExpr(retExpr).isSubTypeOf(retType.getType))
+          Reporter.error("Return type does not match declared type", retExpr)
       case _ => sys.error("This should not be able to happen")
     }
 
