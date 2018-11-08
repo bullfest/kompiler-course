@@ -22,6 +22,8 @@ object TypeChecking extends Phase[Program, Program] {
         vars.foreach(tcTree)
         exprs.foreach(tcExpr(_))
       case ClassDecl(id, parent, vars, methods) =>
+        vars.foreach(tcTree)
+        methods.foreach(tcTree)
       case VarDecl(tpe, id, expr) =>
       case MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
       case _ => sys.error("This should not be able to happen")
