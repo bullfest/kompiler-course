@@ -29,6 +29,9 @@ object TypeChecking extends Phase[Program, Program] {
           else
             TError
         case And(lhs, rhs) =>
+          tcExpr(lhs, TBoolean)
+          tcExpr(rhs, TBoolean)
+          TBoolean
         case Or(lhs, rhs) =>
         case Minus(lhs, rhs) =>
         case Times(lhs, rhs) =>
