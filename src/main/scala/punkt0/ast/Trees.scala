@@ -160,6 +160,7 @@ object Trees {
 
     def collectSymbol: ClassSymbol = {
       val symbol = new ClassSymbol(id.value)
+      symbol.setType(TClass(symbol))
       setSymbol(symbol)
       id.setSymbol(symbol)
       for (variable <- vars) {
