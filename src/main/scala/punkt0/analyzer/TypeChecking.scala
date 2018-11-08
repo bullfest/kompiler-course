@@ -109,6 +109,8 @@ object TypeChecking extends Phase[Program, Program] {
       }
       expr.setType(tpe)
 
+      if (tpe == TError)
+        Reporter.error("Type error: Bad type", expr)
       // Check result and return a valid type in case of error
       if (expected.isEmpty) {
         tpe
