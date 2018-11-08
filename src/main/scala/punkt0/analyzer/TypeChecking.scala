@@ -12,6 +12,17 @@ object TypeChecking extends Phase[Program, Program] {
    * attaching types to trees and potentially outputting error messages. */
   def run(prog: Program)(ctx: Context): Program = {
 
+    def tcTree(tree: Tree): Unit = tree match {
+      case Program(main, classes) =>
+        tcTree(main)
+        classes.foreach(tcTree)
+      case MainDecl(obj, parent, vars, exprs) =>
+      case ClassDecl(id, parent, vars, methods) =>
+      case VarDecl(tpe, id, expr) =>
+      case MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
+      case _ => sys.error("This should not be able to happen")
+    }
+
     def tcOperator(operator: BinaryOperator): Type = {
       operator match {
         case Plus(lhs, rhs) =>
@@ -128,6 +139,7 @@ object TypeChecking extends Phase[Program, Program] {
       }
     }
 
+    tcTree(prog)
     prog
   }
 
