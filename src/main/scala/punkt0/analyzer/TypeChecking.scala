@@ -108,6 +108,10 @@ object TypeChecking extends Phase[Program, Program] {
           tcExpr(expr, TString, TInt, TBoolean)
           TUnit
         case Assign(id, expr) =>
+          val t1 = tcExpr(expr)
+          if (!t1.isSubTypeOf(id.getType))
+            Reporter.error(t1 + "is not a subtype of " + id.getType, expr)
+          TUnit
       }
       expr.setType(tpe)
 
