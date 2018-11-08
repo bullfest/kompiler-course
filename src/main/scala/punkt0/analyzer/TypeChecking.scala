@@ -87,6 +87,24 @@ object TypeChecking extends Phase[Program, Program] {
         case operator: BinaryOperator =>
           tcOperator(operator)
         case MethodCall(obj, meth, args) =>
+          val t1 = tcExpr(obj)
+          t1 match {
+            case TClass(classSymbol) =>
+              classSymbol.lookupMethod(meth.value) match {
+                case Some(methodSymbol) =>
+                  if (args.size != methodSymbol.params.size ||
+                    !(args.map(tcExpr(_)), methodSymbol.params.values.map(_.getType)).zipped.forall(_.isSubTypeOf(_)))
+                    Reporter.error("Argument types do not match method parameters", meth)
+                  meth.setSymbol(methodSymbol)
+                  methodSymbol.getType
+                case None =>
+                  Reporter.error("Method does not exist", meth)
+                  TError
+              }
+            case _ =>
+              Reporter.error("You can not call a method on anything that isn't a class type", obj)
+              TError
+          }
         case IntLit(value) =>
           TInt
         case StringLit(value) =>
