@@ -3,7 +3,7 @@ package punkt0
 import java.io.File
 
 import lexer._
-import punkt0.analyzer.{NameAnalysis, TypedASTPrinter}
+import punkt0.analyzer.{NameAnalysis, TypeChecking, TypedASTPrinter}
 import punkt0.ast.{Parser, Printer}
 
 
@@ -69,7 +69,7 @@ object Main {
     }
 
     if (ctx.doASTPlus) {
-      val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
+      val result = Lexer.andThen(Parser).andThen(NameAnalysis).andThen(TypeChecking).run(ctx.file.get)(ctx)
       print(TypedASTPrinter.apply(result))
       sys.exit(0)
     }
@@ -97,6 +97,6 @@ object Main {
   def main(args: Array[String]): Unit = {
     val ctx = processOptions(args)
 
-    val result = Lexer.andThen(Parser).andThen(NameAnalysis).run(ctx.file.get)(ctx)
+    val result = Lexer.andThen(Parser).andThen(NameAnalysis).andThen(TypeChecking).run(ctx.file.get)(ctx)
   }
 }
