@@ -17,6 +17,10 @@ object TypeChecking extends Phase[Program, Program] {
         tcTree(main)
         classes.foreach(tcTree)
       case MainDecl(obj, parent, vars, exprs) =>
+        if (parent.getSymbol.name != "App")
+          Reporter.error("Main declaration must extend \"App\"", tree)
+        vars.foreach(tcTree)
+        exprs.foreach(tcExpr(_))
       case ClassDecl(id, parent, vars, methods) =>
       case VarDecl(tpe, id, expr) =>
       case MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
