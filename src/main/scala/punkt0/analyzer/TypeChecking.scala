@@ -22,6 +22,12 @@ object TypeChecking extends Phase[Program, Program] {
           else
             TInt
         case Equals(lhs, rhs) =>
+          val t1 = tcExpr(lhs)
+          val t2 = tcExpr(rhs)
+          if ((t1.isSubTypeOf(TNull) && t2.isSubTypeOf(TNull)) || t1 == t2)
+            TBoolean
+          else
+            TError
         case And(lhs, rhs) =>
         case Or(lhs, rhs) =>
         case Minus(lhs, rhs) =>
