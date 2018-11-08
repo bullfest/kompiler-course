@@ -105,6 +105,8 @@ object TypeChecking extends Phase[Program, Program] {
           tcExpr(body, TUnit)
           TUnit
         case Println(expr) =>
+          tcExpr(expr, TString, TInt, TBoolean)
+          TUnit
         case Assign(id, expr) =>
       }
       expr.setType(tpe)
