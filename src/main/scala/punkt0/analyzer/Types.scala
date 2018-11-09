@@ -99,6 +99,8 @@ object Types {
   case object TNull extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = tpe match {
       case TNull => true
+      case TString => true
+      case TClass(_) => true
       case _ => false
     }
 
