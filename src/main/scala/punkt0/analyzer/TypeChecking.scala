@@ -132,7 +132,10 @@ object TypeChecking extends Phase[Program, Program] {
           for (e <- exprs) {
             lastType = tcExpr(e)
           }
-          lastType
+          if (lastType == null)
+            TUnit // Block was empty
+          else
+            lastType
         case If(cond, thn, els) =>
           tcExpr(cond, TBoolean)
           val t1 = tcExpr(thn)
