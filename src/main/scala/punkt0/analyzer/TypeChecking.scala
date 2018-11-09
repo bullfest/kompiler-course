@@ -148,6 +148,11 @@ object TypeChecking extends Phase[Program, Program] {
             case Some(els_) =>
               val t2 = tcExpr(els_)
               t1 match {
+                case TNull => if (t2.isInstanceOf[TClass] || t2 == TNull) {
+                  TNull
+                } else {
+                  TError
+                }
                 case t1: TClass => t1.leastCommonParent(t2)
                 case _ =>
                   if (t1 == t2)
