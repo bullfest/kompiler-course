@@ -182,6 +182,7 @@ object TypeChecking extends Phase[Program, Program] {
     }
 
     tcTree(prog)
+    Reporter.terminateIfErrors()
     prog
   }
 

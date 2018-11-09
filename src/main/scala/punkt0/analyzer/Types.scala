@@ -51,13 +51,13 @@ object Types {
   case object TError extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = true
 
-    override def toString: String = "[error]"
+    override def toString: String = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[error]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   }
 
   case object TUntyped extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = false
 
-    override def toString: String = "[untyped]"
+    override def toString: String = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[untyped]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   }
 
   case object TInt extends Type {
