@@ -29,7 +29,7 @@ object Symbols {
   }
 
   private object ID {
-    private var c: Int = 0
+    private var c: Int = 1
 
     def next: Int = {
       val ret = c
