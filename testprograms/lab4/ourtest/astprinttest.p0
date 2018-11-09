@@ -1,9 +1,17 @@
 class Fact {
     var fah: Int = 2;
+    def foo(): Fact = {
+    var x:Int = 2;
+    var y:Fact = null;
+    x = 3;
+    y = new Fact();
+    y = null;
+    null
+    }
 }
 
 object Main extends App {
-    var fah: Int = 2;
+    var fah: Fact = null;
     println("f" + "oo" == "fo" + "o");
     println(new Fact() == new Fact())
 }

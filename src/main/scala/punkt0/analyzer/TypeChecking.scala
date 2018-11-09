@@ -25,7 +25,10 @@ object TypeChecking extends Phase[Program, Program] {
         vars.foreach(tcTree)
         methods.foreach(tcTree)
       case VarDecl(tpe, id, expr) =>
-        tcExpr(expr, tpe.getType)
+        if (tpe.getType.isInstanceOf[TClass])
+          tcExpr(expr, tpe.getType, TNull)
+        else
+          tcExpr(expr, tpe.getType)
       case m@MethodDecl(overrides, retType, id, args, vars, exprs, retExpr) =>
         if (overrides) {
           val overriddenMethod = m.getSymbol.classSymbol.parent.get.lookupMethod(id.value).get
@@ -37,8 +40,10 @@ object TypeChecking extends Phase[Program, Program] {
         }
         vars.foreach(tcTree)
         exprs.foreach(tcExpr(_))
-        if (!tcExpr(retExpr).isSubTypeOf(retType.getType))
-          Reporter.error("Return type does not match declared type", retExpr)
+        val retExprType = tcExpr(retExpr)
+        if (!retExprType.isSubTypeOf(retType.getType))
+          if (!(retType.getType.isInstanceOf[TClass] && retExprType == TNull))
+            Reporter.error("Return type does not match declared type", retExpr)
       case _ => sys.error("This should not be able to happen")
     }
 
@@ -163,7 +168,8 @@ object TypeChecking extends Phase[Program, Program] {
         case Assign(id, expr) =>
           val t1 = tcExpr(expr)
           if (!t1.isSubTypeOf(id.getType))
-            Reporter.error(t1 + "is not a subtype of " + id.getType, expr)
+            if (!(id.getType.isInstanceOf[TClass] && t1 == TNull))
+            Reporter.error(t1 + " is not a subtype of " + id.getType, expr)
           TUnit
       }
       expr.setType(tpe)
