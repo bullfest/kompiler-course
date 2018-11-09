@@ -175,11 +175,11 @@ object Trees {
       }
       for (method <- methods) {
         val methodSymbol = method.collectSymbol(symbol)
-        symbol.lookupMethod(symbol.name) match {
+        symbol.lookupMethod(methodSymbol.name) match {
           case Some(_) =>
             NameAnalysis.multipleDeclarationError(method)
           case None =>
-            symbol.lookupVar(symbol.name) match {
+            symbol.lookupVar(methodSymbol.name) match {
               case Some(_) =>
                 NameAnalysis.multipleDeclarationError(method)
               case None =>
