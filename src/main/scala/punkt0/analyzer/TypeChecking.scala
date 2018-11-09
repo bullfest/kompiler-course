@@ -156,7 +156,10 @@ object TypeChecking extends Phase[Program, Program] {
                     TError
               }
             case None =>
-              TUnit
+              if (t1 == TUnit)
+                TUnit
+              else
+                TError
           }
         case While(cond, body) =>
           tcExpr(cond, TBoolean)
