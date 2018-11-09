@@ -139,12 +139,14 @@ object TypeChecking extends Phase[Program, Program] {
           els match {
             case Some(els_) =>
               val t2 = tcExpr(els_)
-              if (t1.isSubTypeOf(t2))
-                t2
-              else if (t2.isSubTypeOf(t1))
-                t1
-              else
-                TError
+              t1 match {
+                case t1: TClass => t1.leastCommonParent(t2)
+                case _ =>
+                  if (t1 == t2)
+                    t1
+                  else
+                    TError
+              }
             case None =>
               TUnit
           }

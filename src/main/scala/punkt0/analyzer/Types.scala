@@ -35,6 +35,16 @@ object Types {
       }
     }
 
+    def leastCommonParent(tpe: Type): Type = {
+      if (tpe.isSubTypeOf(this))
+        this
+      else
+        classSymbol.parent match {
+          case Some(parentSymbol) => parentSymbol.getType.asInstanceOf[TClass].leastCommonParent(tpe)
+          case None => anyRef
+        }
+    }
+
     override def toString: String = classSymbol.name
   }
 
