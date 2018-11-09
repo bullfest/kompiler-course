@@ -43,8 +43,6 @@ object NameAnalysis extends Phase[Program, Program] {
 
     val globalScope = new Symbols.GlobalScope
 
-    globalScope.mainClass = prog.main.collectSymbol
-
     for (cls <- prog.classes) {
       val symbol = cls.collectSymbol
       // Don't allow classes with the same name
@@ -55,6 +53,8 @@ object NameAnalysis extends Phase[Program, Program] {
           globalScope.classes += (symbol.name -> symbol)
       }
     }
+
+    globalScope.mainClass = prog.main.collectSymbol
 
     prog.attachSymbols(globalScope)
 
