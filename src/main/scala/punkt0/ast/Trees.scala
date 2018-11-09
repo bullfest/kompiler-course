@@ -101,6 +101,7 @@ object Trees {
 
     def collectSymbol: ClassSymbol = {
       val symbol = new ClassSymbol(obj.value)
+      symbol.is_main_decl = true
       setSymbol(symbol)
       obj.setSymbol(symbol)
       for (variable <- vars) {
@@ -514,6 +515,8 @@ object Trees {
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
       if (classScope != null) {
+        if (classScope.is_main_decl)
+          Reporter.error("this can't be used in the main declaration", this)
         setSymbol(classScope)
         return
       }

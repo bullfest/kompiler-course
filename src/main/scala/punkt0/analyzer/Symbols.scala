@@ -49,6 +49,7 @@ object Symbols {
     var parent: Option[ClassSymbol] = None
     var methods: Map[String, MethodSymbol] = Map[String, MethodSymbol]()
     var members: Map[String, VariableSymbol] = Map[String, VariableSymbol]()
+    var is_main_decl:Boolean = false
 
     def lookupMethod(n: String): Option[MethodSymbol] = methods.get(n) match {
       case m @ Some(_) => m
