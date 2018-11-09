@@ -179,12 +179,7 @@ object Trees {
           case Some(_) =>
             NameAnalysis.multipleDeclarationError(method)
           case None =>
-            symbol.lookupVar(methodSymbol.name) match {
-              case Some(_) =>
-                NameAnalysis.multipleDeclarationError(method)
-              case None =>
-                symbol.methods += (methodSymbol.name -> methodSymbol)
-            }
+            symbol.methods += (methodSymbol.name -> methodSymbol)
         }
       }
       symbol
