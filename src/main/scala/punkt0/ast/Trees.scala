@@ -659,7 +659,12 @@ object Trees {
           case Some(symbol) =>
             id.setSymbol(symbol)
           case None =>
-            NameAnalysis.assignmentIdentNotFoundError(id)
+            classScope.lookupVar(id.value) match {
+              case Some(symbol) =>
+                id.setSymbol(symbol)
+              case None =>
+                NameAnalysis.assignmentIdentNotFoundError(id)
+            }
         }
       } else {
         classScope.lookupVar(id.value) match {
