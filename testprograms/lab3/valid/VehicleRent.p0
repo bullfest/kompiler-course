@@ -67,7 +67,7 @@ class RentingAgency {
 class Client {
    // general client attributes
    var clientNumber : Int = 0;
-   var name : String = null;
+   var name : String = "";
    
    // information about the rented vehicle
    var rent : Boolean = false;
@@ -75,7 +75,7 @@ class Client {
    
    // creates the client (should be called only once!)
    def create(nb : Int,n : String) : String = {
-      var msg : String = null;
+      var msg : String = "";
       
       clientNumber = nb;
       name = n;
@@ -86,7 +86,7 @@ class Client {
    
    // the client wants to rent a vehicle
    def rent(vehicle : Vehicle) : String = {
-      var msg : String = null;
+      var msg : String = "";
       
       if(rent || vehicle.getRented()) {
          if(rent) {
@@ -104,7 +104,7 @@ class Client {
    
    // the client returns a vehicle
    def restore(vehicle : Vehicle, milage : Int) : String = {
-      var msg : String = null;
+      var msg : String = "";
       
       if(rent && vehicle.getRented() && rentedVehicle == vehicle.getNumber()) {
          rent = false;
@@ -124,7 +124,7 @@ class Vehicle {
    // general attributes
    var number : Int = 0;
    var milage : Int = 0;
-   var brand : String = null;
+   var brand : String = "";
    
    // true = vehicle rented, false = vehicle available
    var rented : Boolean = false;
@@ -144,7 +144,7 @@ class Vehicle {
    
    // gives a string with the cars attributes
    def description() : String = {
-      var descr : String = null;
+      var descr : String = "";
       descr = "#" + number + ", " + brand + ", " + milage + "km";
       descr
    }

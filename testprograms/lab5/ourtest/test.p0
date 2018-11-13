@@ -1,0 +1,21 @@
+ class B extends A {
+      override def foo(): Int = {
+        value = 42;
+        A = (if (true) new A() else new B()).foo();
+        value
+      }
+    }
+
+    class A {
+      var value: Int = 0;
+      var A: Int = 0;
+      def foo(): Int = {
+        var value: Boolean = true;
+        value = false;
+        41
+      }
+    }
+
+    object Main extends App {
+      println(new B().foo())
+    }

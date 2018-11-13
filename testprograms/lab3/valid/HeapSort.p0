@@ -98,7 +98,7 @@ class HS {
 	
 	def print() : Int = {
 		var j : Int = 0;
-		var str : String = null;
+		var str : String = "";
 		
 		j = 0 ;
 		str = "";

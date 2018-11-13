@@ -42,7 +42,7 @@ class PolymorphismTest {
   }
   
   def displayShape(shape : Shape) : Int = {
-    var text : String = null;
+    var text : String = "";
     
     text = "I am a " + shape.getColor();
     text = text + " ";
@@ -62,8 +62,8 @@ class ReferenceTest {
     var int2 : Int = 0;
     var intArr1 : Arr = null;
     var intArr2 : Arr = null;
-    var string1 : String = null;
-    var string2 : String = null;
+    var string1 : String = "";
+    var string2 : String = "";
     var shape1 : Shape = null;
     var shape2 : Shape = null;
     
@@ -118,8 +118,9 @@ class ReferenceTest {
   }
 
   def swapBoolean(n1In : Boolean, n2In : Boolean) : Int = {
-    var n1: Boolean = n1In; var n2: Boolean = n2In;
+    var n1: Boolean = true; var n2: Boolean = true;
     var temp : Boolean = false;
+    n1 = n1In; n2 = n2In;
     temp = n1;
     n1 = n2;
     n2 = temp;
@@ -127,8 +128,9 @@ class ReferenceTest {
   }
 
   def swapInt(n1In : Int, n2In : Int) : Int = {
-    var n1: Int = n1In; var n2: Int = n2In;
+    var n1: Int = 0; var n2: Int = 0;
     var temp : Int = 0;
+    n1 = n1In; n2 = n2In;
     temp = n1;
     n1 = n2;
     n2 = temp;
@@ -136,8 +138,9 @@ class ReferenceTest {
   }
 
   def swapIntArr(n1In : Arr, n2In : Arr) : Int = {
-    var n1: Arr = n1In; var n2: Arr = n2In;
+    var n1: Arr = null; var n2: Arr = null;
     var temp : Arr = null;
+    n1 = n1In; n2 = n2In;
     temp = n1;
     n1 = n2;
     n2 = temp;
@@ -153,8 +156,9 @@ class ReferenceTest {
   }
 
   def swapString(n1In : String, n2In : String) : Int = {
-    var n1: String = n1In; var n2: String = n2In;
-    var temp : String = null;
+    var n1: String = ""; var n2: String = "";
+    var temp : String = "";
+    n1 = n1In; n2 = n2In;
     temp = n1;
     n1 = n2;
     n2 = temp;
@@ -162,13 +166,15 @@ class ReferenceTest {
   }
 
   def concatStringValue(n1 : String, n2 : String) : Int = {
-    var n1tmp: String = n1 + n2;
+    var n1tmp: String = "";
+    n1tmp = n1 + n2;
     0
   }
   
   def swapShape(n1In : Shape, n2In : Shape) : Int = {
-    var n1: Shape = n1In; var n2: Shape = n2In;
+    var n1: Shape = null; var n2: Shape = null;
     var temp : Shape = null;
+    n1 = n1In; n2 = n2In;
     temp = n1;
     n1 = n2;
     n2 = temp;
@@ -177,14 +183,15 @@ class ReferenceTest {
 
   def resetShape(n1In : Shape, n2 : Shape) : Int = {
     var unit : Int = 0;
-    var n1: Shape = new Shape().init("3");
+    var n1: Shape = null;
+    n1 = new Shape().init("3");
     unit = n2.setColor("3");
     0
   }
 }
 
 class Shape {
-  var color : String = null;
+  var color : String = "";
   
   def init(col: String) : Shape = {
     color = col;
@@ -227,8 +234,8 @@ class Rectangle extends Shape {
   }
   
   override def draw() : Int = {
-    var first: String = null;
-    var second: String = null;
+    var first: String = "";
+    var second: String = "";
     var i: Int = 0;
     i = 0;    
     first = " ";

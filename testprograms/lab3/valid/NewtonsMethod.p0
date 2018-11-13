@@ -191,7 +191,7 @@ class Real {
     }
 
     def str() : String = {
-        var ret : String = null;
+        var ret : String = "";
         var i : Int = 0;
 
         ret = "" + integerPart + ".";
@@ -294,7 +294,7 @@ class Frac {
     }
 
     def str() : String = {
-        var result : String = null;
+        var result : String = "";
         if(sign) {
             result = ""
         } else {

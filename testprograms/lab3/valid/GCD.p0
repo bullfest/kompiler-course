@@ -22,7 +22,8 @@ class GreatestCommonDivisor {
 	}
 	
 	def gcd(aIn : Int, bIn : Int) : Int = {
-		var a: Int = aIn; var b: Int = bIn;
+		var a: Int = 0; var b: Int = 0;
+		a = aIn; b = bIn;
 		while( !(b==0) ){
 			t = b;
 			b = this.modulo(a,b);

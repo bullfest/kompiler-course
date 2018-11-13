@@ -189,7 +189,7 @@ class SudokuGrid {
 
     def display() : Boolean = {
         var i : Int = 0;
-        var separator : String = null;
+        var separator : String = "";
 
         i = 0;
         separator = "+-------+-------+-------+";
@@ -204,7 +204,7 @@ class SudokuGrid {
 
     def lineDisplay(line : Int) : String = {
         var column : Int = 0;
-        var result : String = null;
+        var result : String = "";
 
         column = 0;
         result = "";

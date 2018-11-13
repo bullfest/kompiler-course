@@ -90,7 +90,8 @@ class Board {
 
   def modulo(left : Int, right : Int) : Int = {
     // modulo operator needed to simulate infinite board
-    var m : Int = left - right*(left/right);
+    var m : Int = 0;
+    m = left - right*(left/right);
     if (m == 0) m = right; m	// hack
   }
 

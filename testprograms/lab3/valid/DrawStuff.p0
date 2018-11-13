@@ -9,8 +9,8 @@ class Drawable {
 	// render the drawing by getting its pixel value one by one
 	def render(): String = {
 		var depth: Int = 0;
-		var screen: String = null;
-		var symb: String = null;
+		var screen: String = "";
+		var symb: String = "";
 		var x: Int = 0;
 		var y: Int = 0;
 		
@@ -65,12 +65,14 @@ class Drawable {
 // Concentric circles, giving a representation of successive integer overflows.
 class ConcentricCircles extends Drawable {
 	override def computePixel(xIn:Int, yIn:Int): Int = {
-		var x: Int = xIn; var y: Int = yIn;
+		var x: Int = 0; var y: Int = 0;
 		var x0: Int = 0;
 		var y0: Int = 0;
 		var iter: Int = 0;
 		var maxIter: Int = 0;
 		var xTemp: Int = 0;
+		x = xIn;
+		y = yIn;
 		
 		resX = 65;
 		resY = 30;
@@ -101,7 +103,7 @@ class ConcentricCircles extends Drawable {
 // Representation of a Mandelbrot set (not so pretty due to rounding).
 class Mandelbrot extends Drawable {
 	override def computePixel(xIn:Int, yIn:Int): Int = {
-		var x: Int = xIn; var y: Int = yIn;
+		var x: Int = 0; var y: Int = 0;
 		// using pseudocode from Wikipedia Mandelbrot page
 		// http://en.wikipedia.org/wiki/Mandelbrot_set
 		
@@ -110,7 +112,9 @@ class Mandelbrot extends Drawable {
 		var iter: Int = 0;
 		var maxIter: Int = 0;
 		var xTemp: Int = 0;
-		
+
+		x = xIn; y = yIn;
+
 		resX = 70;
 		resY = 40;
 		
@@ -140,13 +144,15 @@ class Mandelbrot extends Drawable {
 // Another cool pattern.
 class Cross extends Drawable {
 	override def computePixel(xIn:Int, yIn:Int): Int = {
-		var x: Int = xIn; var y: Int = yIn;
+		var x: Int = 0; var y: Int = 0;
 		var x0: Int = 0;
 		var y0: Int = 0;
 		var iter: Int = 0;
 		var maxIter: Int = 0;
 		var xTemp: Int = 0;
 		var s: Int = 0; //scale
+		x = xIn; y = yIn;
+
 		s= 13;
 		
 		resX = 50;

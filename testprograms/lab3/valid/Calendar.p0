@@ -76,7 +76,7 @@ class CalendarImpl {
     def displayWeek(first : Int, last : Int) : String = {
         var current : Int = 0;
         var counter : Int = 0;
-        var result : String = null;
+        var result : String = "";
 
         current = first;
         counter = 0;
