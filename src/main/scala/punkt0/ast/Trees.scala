@@ -384,7 +384,7 @@ object Trees {
       }
       attachSymbolsType(retType, gs)
       getSymbol.setType(retType.getType)
-      args.foreach(_.attachSymbols(gs))
+      args.foreach(_.attachSymbols(gs, classScope, getSymbol))
       vars.foreach(_.attachSymbols(gs, classScope, getSymbol))
       exprs.foreach(_.attachSymbols(gs, classScope, getSymbol))
       retExpr.attachSymbols(gs, classScope, getSymbol)
