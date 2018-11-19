@@ -209,7 +209,7 @@ object Trees {
       sb.append(" " * indent).append("}")
     }
 
-    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
+    def attachInheritance(gs: GlobalScope): Unit = {
       parent match {
         case Some(parent_) =>
           gs.lookupClass(parent_.value) match {
@@ -223,7 +223,9 @@ object Trees {
           }
         case None =>
       }
+    }
 
+    override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
       vars.foreach(_.attachSymbols(gs, getSymbol))
       methods.foreach(_.attachSymbols(gs, getSymbol))
     }

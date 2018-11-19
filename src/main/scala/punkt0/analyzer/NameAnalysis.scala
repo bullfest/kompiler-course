@@ -56,6 +56,8 @@ object NameAnalysis extends Phase[Program, Program] {
 
     globalScope.mainClass = prog.main.collectSymbol
 
+    prog.classes.foreach(_.attachInheritance(globalScope))
+
     prog.attachSymbols(globalScope)
 
     // Step 1: Collect symbols in declarations
