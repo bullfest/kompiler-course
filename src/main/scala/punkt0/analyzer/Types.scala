@@ -19,6 +19,7 @@ object Types {
   }
 
   sealed abstract class Type {
+    val compilerType: String
     def isSubTypeOf(tpe: Type): Boolean
   }
 
@@ -46,18 +47,24 @@ object Types {
     }
 
     override def toString: String = classSymbol.name
+
+    override val compilerType: String = "L" + classSymbol.name
   }
 
   case object TError extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = true
 
     override def toString: String = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[error]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
+    override val compilerType: String = "Error" // Shouldn't ever be used
   }
 
   case object TUntyped extends Type {
     override def isSubTypeOf(tpe: Type): Boolean = false
 
     override def toString: String = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[untyped]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
+    override val compilerType: String = "Untyped" // Shouldn't ever be used
   }
 
   case object TInt extends Type {
@@ -67,6 +74,8 @@ object Types {
     }
 
     override def toString: String = "Int"
+
+    override val compilerType: String = "I"
   }
 
   case object TBoolean extends Type {
@@ -76,6 +85,8 @@ object Types {
     }
 
     override def toString: String = "Boolean"
+
+    override val compilerType: String = "Z"
   }
 
   case object TString extends Type {
@@ -85,6 +96,8 @@ object Types {
     }
 
     override def toString: String = "String"
+
+    override val compilerType: String = "Ljava/lang/String"
   }
 
   case object TUnit extends Type {
@@ -94,6 +107,8 @@ object Types {
     }
 
     override def toString: String = "Unit"
+
+    override val compilerType: String = "V"
   }
 
   case object TNull extends Type {
@@ -104,5 +119,7 @@ object Types {
     }
 
     override def toString: String = "Null"
+
+    override val compilerType: String = "L"
   }
 }
