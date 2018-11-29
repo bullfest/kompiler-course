@@ -62,21 +62,48 @@ object CodeGeneration extends Phase[Program, Unit] {
     def generateCode(ch: CodeHandler, exprTree: ExprTree): Unit = {
       exprTree match {
         case And(lhs, rhs) =>
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << IAND
         case Or(lhs, rhs) =>
-        case Plus(lhs, rhs) =>
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << IOR
+        case plus@Plus(lhs, rhs) =>
+          if (plus.getType == TString) {
+            //TODO ???
+          } else {
+            generateCode(ch, lhs)
+            generateCode(ch, rhs)
+            ch << IADD
+          }
         case Minus(lhs, rhs) =>
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << ISUB
         case Times(lhs, rhs) =>
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << IMUL
         case Div(lhs, rhs) =>
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << IDIV
         case LessThan(lhs, rhs) =>
         case Equals(lhs, rhs) =>
         case MethodCall(obj, meth, args) =>
         case IntLit(value) =>
+          ch << Ldc(value)
         case StringLit(value) =>
+          ch << Ldc(value)
         case True() =>
+          ch << ICONST_1
         case False() =>
+          ch << ICONST_0
         case Identifier(value) =>
         case This() =>
         case Null() =>
+          ch << ACONST_NULL
         case New(tpe) =>
         case Not(expr) =>
         case Block(exprs) =>
