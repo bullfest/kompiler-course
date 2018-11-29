@@ -31,7 +31,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       val constructorCH = classFile.addConstructor().codeHandler
       ct.vars foreach {
         field =>
-          generateCode(constructorCH,field.expr)
+          generateCode(constructorCH, field.expr)
           constructorCH << PutField(className, field.id.value, field.tpe.getType.compilerType)
       }
       constructorCH.freeze
@@ -71,7 +71,12 @@ object CodeGeneration extends Phase[Program, Unit] {
           ch << IOR
         case plus@Plus(lhs, rhs) =>
           if (plus.getType == TString) {
-            //TODO ???
+            ch << DefaultNew("java/lang/StringBuilder")
+            generateCode(ch, lhs)
+            ch << InvokeVirtual("java/lang/StringBuilder", "append", s"(${lhs.getType.compilerType})Ljava/lang/StringBuilder;")
+            generateCode(ch, rhs)
+            ch << InvokeVirtual("java/lang/StringBuilder", "append", s"(${rhs.getType.compilerType})Ljava/lang/StringBuilder;")
+            ch << InvokeVirtual("java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
           } else {
             generateCode(ch, lhs)
             generateCode(ch, rhs)
@@ -90,6 +95,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, rhs)
           ch << IDIV
         case LessThan(lhs, rhs) =>
+
         case Equals(lhs, rhs) =>
         case MethodCall(obj, meth, args) =>
         case IntLit(value) =>
@@ -105,11 +111,15 @@ object CodeGeneration extends Phase[Program, Unit] {
         case Null() =>
           ch << ACONST_NULL
         case New(tpe) =>
+          ch << DefaultNew(tpe.value)
         case Not(expr) =>
         case Block(exprs) =>
         case If(cond, thn, els) =>
         case While(cond, body) =>
         case Println(expr) =>
+          ch << GetStatic("java/lang/System", "out", "Ljava/io/PrintStream;")
+          generateCode(ch, expr)
+          ch << InvokeVirtual("java/io/PrintStream", "println", s"(${expr.getType.compilerType})V")
         case Assign(id, expr) =>
       }
     }
