@@ -1,12 +1,11 @@
 package punkt0
 package code
 
-import ast.Trees._
-import analyzer.Symbols._
-import analyzer.Types._
+import cafebabe.AbstractByteCodes.{New => _, _}
+import cafebabe.ByteCodes._
 import cafebabe._
-import AbstractByteCodes.{New => _, _}
-import ByteCodes._
+import punkt0.analyzer.Types._
+import punkt0.ast.Trees._
 
 object CodeGeneration extends Phase[Program, Unit] {
 
@@ -62,13 +61,49 @@ object CodeGeneration extends Phase[Program, Unit] {
     def generateCode(ch: CodeHandler, exprTree: ExprTree): Unit = {
       exprTree match {
         case And(lhs, rhs) =>
+          //If either operand is false go to falseLabel
+          val falseLabel = ch.getFreshLabel("false")
+          val afterLabel = ch.getFreshLabel("after")
+
           generateCode(ch, lhs)
+          ch << IfEq(falseLabel)
+
           generateCode(ch, rhs)
-          ch << IAND
+          ch << IfEq(falseLabel)
+
+          // True
+          ch <<
+            ILOAD_1 <<
+            Goto(afterLabel)
+          // False
+          ch <<
+            Label(falseLabel) <<
+            ILOAD_0
+
+          ch <<
+            Label(afterLabel)
         case Or(lhs, rhs) =>
+          // If either operand is true go to trueLabel
+          val trueLabel = ch.getFreshLabel("true")
+          val afterLabel = ch.getFreshLabel("after")
+
           generateCode(ch, lhs)
+          ch << IfNe(trueLabel)
+
           generateCode(ch, rhs)
-          ch << IOR
+          ch << IfNe(trueLabel)
+
+          // False
+          ch <<
+            ILOAD_0 <<
+            Goto(afterLabel)
+          // True
+          ch <<
+            Label(trueLabel) <<
+            ILOAD_1
+
+          ch <<
+            Label(afterLabel)
         case plus@Plus(lhs, rhs) =>
           if (plus.getType == TString) {
             ch << DefaultNew("java/lang/StringBuilder")
