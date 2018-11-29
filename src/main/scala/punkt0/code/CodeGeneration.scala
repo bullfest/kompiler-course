@@ -150,6 +150,28 @@ object CodeGeneration extends Phase[Program, Unit] {
             Label(afterLabel)
 
         case Equals(lhs, rhs) =>
+          val trueLabel = ch.getFreshLabel("true")
+          val afterLabel = ch.getFreshLabel("after")
+
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          if (TNull.isSubTypeOf(lhs.getType)) //It's a object
+            ch << If_ACmpEq(trueLabel)
+          else
+            ch << If_ICmpEq(trueLabel)
+
+          // False
+          ch <<
+            ILOAD_0 <<
+            Goto(afterLabel)
+          // True
+          ch <<
+            Label(trueLabel) <<
+            ILOAD_1
+
+          ch <<
+            Label(afterLabel)
+
         case MethodCall(obj, meth, args) =>
         case IntLit(value) =>
           ch << Ldc(value)
