@@ -130,6 +130,24 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, rhs)
           ch << IDIV
         case LessThan(lhs, rhs) =>
+          val trueLabel = ch.getFreshLabel("true")
+          val afterLabel = ch.getFreshLabel("after")
+
+          generateCode(ch, lhs)
+          generateCode(ch, rhs)
+          ch << If_ICmpLt(trueLabel)
+
+          // False
+          ch <<
+            ILOAD_0 <<
+            Goto(afterLabel)
+          // True
+          ch <<
+            Label(trueLabel) <<
+            ILOAD_1
+
+          ch <<
+            Label(afterLabel)
 
         case Equals(lhs, rhs) =>
         case MethodCall(obj, meth, args) =>
