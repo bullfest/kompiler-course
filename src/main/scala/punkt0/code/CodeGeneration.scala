@@ -4,6 +4,7 @@ package code
 import cafebabe.AbstractByteCodes.{New => _, _}
 import cafebabe.ByteCodes._
 import cafebabe._
+import punkt0.analyzer.Symbols.MethodSymbol
 import punkt0.analyzer.Types._
 import punkt0.ast.Trees._
 
@@ -173,6 +174,13 @@ object CodeGeneration extends Phase[Program, Unit] {
             Label(afterLabel)
 
         case MethodCall(obj, meth, args) =>
+          generateCode(ch, obj)
+          args.foreach(generateCode(ch, _))
+          ch << InvokeVirtual(
+            obj.getType.toString,
+            meth.value,
+            meth.getSymbol.asInstanceOf[MethodSymbol].getSignature
+          )
         case IntLit(value) =>
           ch << Ldc(value)
         case StringLit(value) =>
