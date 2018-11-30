@@ -72,6 +72,8 @@ object CodeGeneration extends Phase[Program, Unit] {
       mt.retType.getType match {
         case TInt | TBoolean =>
           ch << IRETURN
+        case TUnit =>
+          ch << RETURN
         case _ =>
           // All the rest should be class types
           ch << ARETURN
