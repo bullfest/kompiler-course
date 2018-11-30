@@ -325,6 +325,8 @@ object CodeGeneration extends Phase[Program, Unit] {
     }
 
     val mainClass = new cafebabe.ClassFile("Main")
+    mainClass.setSourceFile(sourceName)
+
     val codeHandler = mainClass.addMainMethod.codeHandler
 
     prog.main.vars.foreach(var_ => {
@@ -338,6 +340,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       if (expr.getType != TUnit)
         codeHandler << POP //remove value left on the stack
     }
+    codeHandler << RETURN
 
     codeHandler.freeze
     mainClass.writeToFile(outDir + "Main.class")
