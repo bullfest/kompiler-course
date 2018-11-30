@@ -221,6 +221,14 @@ object CodeGeneration extends Phase[Program, Unit] {
             Label(afterLabel)
 
         case Block(exprs) =>
+          exprs.zipWithIndex.foreach(pair => {
+            val expr = pair._1
+            val index = pair._2
+            generateCode(ch, expr, className, localVars)
+            if (index < exprs.size - 1 && expr.getType != TUnit)
+              ch << POP //remove value left on the stack
+          })
+
         case If(cond, thn, els) =>
           val elseLabel = ch.getFreshLabel("elseLabel")
           val afterLabel = ch.getFreshLabel("afterLabel")
