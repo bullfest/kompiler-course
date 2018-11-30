@@ -31,7 +31,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       val constructorCH = classFile.addConstructor().codeHandler
       ct.vars foreach {
         field =>
-          generateCode(constructorCH, field.expr)
+          generateCode(constructorCH, field.expr, className)
           constructorCH << PutField(className, field.id.value, field.tpe.getType.compilerType)
       }
       constructorCH.freeze
@@ -59,17 +59,17 @@ object CodeGeneration extends Phase[Program, Unit] {
       ch.freeze
     }
 
-    def generateCode(ch: CodeHandler, exprTree: ExprTree): Unit = {
+    def generateCode(ch: CodeHandler, exprTree: ExprTree, className: String, localVars: Map[String, Int] = null): Unit = {
       exprTree match {
         case And(lhs, rhs) =>
           //If either operand is false go to falseLabel
           val falseLabel = ch.getFreshLabel("false")
           val afterLabel = ch.getFreshLabel("after")
 
-          generateCode(ch, lhs)
+          generateCode(ch, lhs, className, localVars)
           ch << IfEq(falseLabel)
 
-          generateCode(ch, rhs)
+          generateCode(ch, rhs, className, localVars)
           ch << IfEq(falseLabel)
 
           // True
@@ -88,10 +88,10 @@ object CodeGeneration extends Phase[Program, Unit] {
           val trueLabel = ch.getFreshLabel("true")
           val afterLabel = ch.getFreshLabel("after")
 
-          generateCode(ch, lhs)
+          generateCode(ch, lhs, className, localVars)
           ch << IfNe(trueLabel)
 
-          generateCode(ch, rhs)
+          generateCode(ch, rhs, className, localVars)
           ch << IfNe(trueLabel)
 
           // False
@@ -108,34 +108,34 @@ object CodeGeneration extends Phase[Program, Unit] {
         case plus@Plus(lhs, rhs) =>
           if (plus.getType == TString) {
             ch << DefaultNew("java/lang/StringBuilder")
-            generateCode(ch, lhs)
+            generateCode(ch, lhs, className, localVars)
             ch << InvokeVirtual("java/lang/StringBuilder", "append", s"(${lhs.getType.compilerType})Ljava/lang/StringBuilder;")
-            generateCode(ch, rhs)
+            generateCode(ch, rhs, className, localVars)
             ch << InvokeVirtual("java/lang/StringBuilder", "append", s"(${rhs.getType.compilerType})Ljava/lang/StringBuilder;")
             ch << InvokeVirtual("java/lang/StringBuilder", "toString", "()Ljava/lang/String;")
           } else {
-            generateCode(ch, lhs)
-            generateCode(ch, rhs)
+            generateCode(ch, lhs, className, localVars)
+            generateCode(ch, rhs, className, localVars)
             ch << IADD
           }
         case Minus(lhs, rhs) =>
-          generateCode(ch, lhs)
-          generateCode(ch, rhs)
+          generateCode(ch, lhs, className, localVars)
+          generateCode(ch, rhs, className, localVars)
           ch << ISUB
         case Times(lhs, rhs) =>
-          generateCode(ch, lhs)
-          generateCode(ch, rhs)
+          generateCode(ch, lhs, className, localVars)
+          generateCode(ch, rhs, className, localVars)
           ch << IMUL
         case Div(lhs, rhs) =>
-          generateCode(ch, lhs)
-          generateCode(ch, rhs)
+          generateCode(ch, lhs, className, localVars)
+          generateCode(ch, rhs, className, localVars)
           ch << IDIV
         case LessThan(lhs, rhs) =>
           val trueLabel = ch.getFreshLabel("true")
           val afterLabel = ch.getFreshLabel("after")
 
-          generateCode(ch, lhs)
-          generateCode(ch, rhs)
+          generateCode(ch, lhs, className, localVars)
+          generateCode(ch, rhs, className, localVars)
           ch << If_ICmpLt(trueLabel)
 
           // False
@@ -154,8 +154,8 @@ object CodeGeneration extends Phase[Program, Unit] {
           val trueLabel = ch.getFreshLabel("true")
           val afterLabel = ch.getFreshLabel("after")
 
-          generateCode(ch, lhs)
-          generateCode(ch, rhs)
+          generateCode(ch, lhs, className, localVars)
+          generateCode(ch, rhs, className, localVars)
           if (TNull.isSubTypeOf(lhs.getType)) //It's a object
             ch << If_ACmpEq(trueLabel)
           else
@@ -174,8 +174,8 @@ object CodeGeneration extends Phase[Program, Unit] {
             Label(afterLabel)
 
         case MethodCall(obj, meth, args) =>
-          generateCode(ch, obj)
-          args.foreach(generateCode(ch, _))
+          generateCode(ch, obj, className, localVars)
+          args.foreach((exprTree: ExprTree) => generateCode(ch, exprTree, className, localVars))
           ch << InvokeVirtual(
             obj.getType.toString,
             meth.value,
@@ -189,7 +189,17 @@ object CodeGeneration extends Phase[Program, Unit] {
           ch << ICONST_1
         case False() =>
           ch << ICONST_0
-        case Identifier(value) =>
+        case ident: Identifier =>
+          if (localVars != null && localVars.contains(ident.value)) {
+            //It's a local variable or a parameter
+            if (ident.getType.eq(TBoolean) || ident.getType.eq(TInt))
+              ch << ILoad(localVars(ident.value))
+            else
+              ch << ALoad(localVars(ident.value))
+          } else {
+            //It's a field
+            ch << GetField(className, ident.value, ident.getType.compilerType)
+          }
         case This() =>
           ArgLoad(0)
         case Null() =>
@@ -218,7 +228,7 @@ object CodeGeneration extends Phase[Program, Unit] {
 
         case Println(expr) =>
           ch << GetStatic("java/lang/System", "out", "Ljava/io/PrintStream;")
-          generateCode(ch, expr)
+          generateCode(ch, expr, className, localVars)
           ch << InvokeVirtual("java/io/PrintStream", "println", s"(${expr.getType.compilerType})V")
         case Assign(id, expr) =>
       }
