@@ -57,21 +57,18 @@ object CodeGeneration extends Phase[Program, Unit] {
       val methSym = mt.getSymbol
 
       for (i <- mt.args.indices) {
-
+        mt.args(i).getSymbol.compilerVariable = i + 1
       }
 
       val offsetToVars = mt.args.length
 
       for (i <- mt.vars.indices) {
-        // TODO mapping
-        // Need the offset here for correct mapping
+        mt.vars(i).getSymbol.compilerVariable = i + 1 + offsetToVars
       }
 
-      // TODO local vars
-      mt.exprs.foreach(expr => generateCode(ch, expr, mt.id.value))
+      mt.exprs.foreach(expr => generateCode(ch, expr))
 
-      // TODO local vars
-      generateCode(ch, mt.retExpr, mt.id.value)
+      generateCode(ch, mt.retExpr)
 
       // Return different bytecode depending on retExpr type
       mt.retType.getType match {
