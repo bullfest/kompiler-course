@@ -54,9 +54,10 @@ object CodeGeneration extends Phase[Program, Unit] {
     // a mapping from variable symbols to positions in the local variables
     // of the stack frame
     def generateMethodCode(ch: CodeHandler, mt: MethodDecl): Unit = {
-      val methSym = mt.getSymbol
+      for (i <- mt.args.indices) {
+        mt.args(i).getSymbol.compilerVariable = i + 1
+      }
 
-      mt.args.foreach(_.getSymbol.compilerVariable = ch.getFreshVar)
       mt.vars.foreach(_.getSymbol.compilerVariable = ch.getFreshVar)
       mt.exprs.foreach(expr => generateCode(ch, expr))
 
