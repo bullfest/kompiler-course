@@ -56,14 +56,8 @@ object CodeGeneration extends Phase[Program, Unit] {
     def generateMethodCode(ch: CodeHandler, mt: MethodDecl): Unit = {
       val methSym = mt.getSymbol
 
-      for (arg <- mt.args) {
-        arg.getSymbol.compilerVariable = ch.getFreshVar
-      }
-
-      for (_var <- mt.vars) {
-        _var.getSymbol.compilerVariable = ch.getFreshVar
-      }
-
+      mt.args.foreach(_.getSymbol.compilerVariable = ch.getFreshVar)
+      mt.vars.foreach(_.getSymbol.compilerVariable = ch.getFreshVar)
       mt.exprs.foreach(expr => generateCode(ch, expr))
 
       generateCode(ch, mt.retExpr)
