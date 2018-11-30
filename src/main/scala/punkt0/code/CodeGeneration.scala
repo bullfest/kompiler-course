@@ -207,6 +207,19 @@ object CodeGeneration extends Phase[Program, Unit] {
         case New(tpe) =>
           ch << DefaultNew(tpe.value)
         case Not(expr) =>
+          val trueLabel = ch.getFreshLabel("true")
+          val afterLabel = ch.getFreshLabel("after")
+          generateCode(ch, expr, className, localVars)
+          ch << IfEq(trueLabel)
+          ch <<
+            ILOAD_0 <<
+            Goto(afterLabel)
+          ch <<
+            Label(trueLabel) <<
+            ILOAD_1
+          ch <<
+            Label(afterLabel)
+
         case Block(exprs) =>
         case If(cond, thn, els) =>
           val elseLabel = ch.getFreshLabel("elseLabel")
