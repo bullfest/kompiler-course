@@ -36,6 +36,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(constructorCH, field.expr)
           constructorCH << PutField(className, field.id.value, field.tpe.getType.compilerType)
       }
+      constructorCH << RETURN
       constructorCH.freeze
 
       ct.methods foreach {
