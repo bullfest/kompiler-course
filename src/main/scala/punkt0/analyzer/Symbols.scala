@@ -104,6 +104,13 @@ object Symbols {
       case None =>
         classSymbol.lookupVar(n)
     }
+
+    def getSignature: String = {
+      "(" +
+        params.mapValues(_.getType.compilerType).mkString("") +
+        ")" +
+        getType.compilerType
+    }
   }
 
   class VariableSymbol(val name: String) extends Symbol
