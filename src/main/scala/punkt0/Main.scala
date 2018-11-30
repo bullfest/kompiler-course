@@ -2,9 +2,10 @@ package punkt0
 
 import java.io.File
 
-import lexer._
 import punkt0.analyzer.{NameAnalysis, TypeChecking, TypedASTPrinter}
 import punkt0.ast.{Parser, Printer}
+import punkt0.code.CodeGeneration
+import punkt0.lexer._
 
 
 object Main {
@@ -97,6 +98,6 @@ object Main {
   def main(args: Array[String]): Unit = {
     val ctx = processOptions(args)
 
-    val result = Lexer.andThen(Parser).andThen(NameAnalysis).andThen(TypeChecking).run(ctx.file.get)(ctx)
+    Lexer.andThen(Parser).andThen(NameAnalysis).andThen(TypeChecking).andThen(CodeGeneration).run(ctx.file.get)(ctx)
   }
 }
