@@ -180,7 +180,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, lhs)
           generateCode(ch, rhs)
           lhs.getType match {
-            case TNull | TString | TClass(classSymbol) =>
+            case TNull | TString | _: TClass =>
               ch << If_ACmpEq(trueLabel)
             case TInt | TBoolean =>
               ch << If_ICmpEq(trueLabel)
@@ -188,6 +188,7 @@ object CodeGeneration extends Phase[Program, Unit] {
               // Comparing 2 Unit-values should always be true.
               ch << ILOAD_1
               return
+            case _ => sys.error("This shouldn't happen")
           }
           if (TNull.isSubTypeOf(lhs.getType)) //It's a object
             ch << If_ACmpEq(trueLabel)
@@ -301,10 +302,11 @@ object CodeGeneration extends Phase[Program, Unit] {
 
     def storeVar(symbol: VariableSymbol): AbstractByteCodeGenerator = {
       symbol.getType match {
-        case TClass(classSymbol) | TNull | TString =>
-          ALoad(symbol.compilerVariable)
+        case _: TClass | TNull | TString =>
+          AStore(symbol.compilerVariable)
         case TInt | TBoolean =>
-          ILoad(symbol.compilerVariable)
+          IStore(symbol.compilerVariable)
+        case _ => sys.error("This shouldn't happen")
       }
     }
 
