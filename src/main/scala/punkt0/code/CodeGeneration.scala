@@ -5,7 +5,7 @@ import cafebabe.AbstractByteCodes.{New => _, _}
 import cafebabe.ByteCodes._
 import cafebabe._
 import punkt0.analyzer.Symbols.{MethodSymbol, VariableSymbol}
-import punkt0.analyzer.Types._
+import punkt0.analyzer.Types
 import punkt0.ast.Trees._
 
 object CodeGeneration extends Phase[Program, Unit] {
@@ -56,7 +56,33 @@ object CodeGeneration extends Phase[Program, Unit] {
     def generateMethodCode(ch: CodeHandler, mt: MethodDecl): Unit = {
       val methSym = mt.getSymbol
 
-      // TODO: Emit code
+      for (i <- mt.args.indices) {
+
+      }
+
+      val offsetToVars = mt.args.length
+
+      for (i <- mt.vars.indices) {
+        // TODO mapping
+        // Need the offset here for correct mapping
+      }
+
+      // TODO local vars
+      mt.exprs.foreach(expr => generateCode(ch, expr, mt.id.value))
+
+      // TODO local vars
+      generateCode(ch, mt.retExpr, mt.id.value)
+
+      // Return different bytecode depending on retExpr type
+      mt.retType.getType match {
+        case Types.TInt =>
+          ch << IRETURN
+        case Types.TBoolean =>
+          ch << IRETURN
+        case _ =>
+          // All the rest should be class types
+          ch << ARETURN
+      }
 
       ch.freeze
     }
