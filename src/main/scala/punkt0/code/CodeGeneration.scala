@@ -301,8 +301,23 @@ object CodeGeneration extends Phase[Program, Unit] {
       ct => generateClassFile(sourceName, ct, outDir)
     }
 
-    // Now do the main declaration
-    // ...
+    val mainClass = new cafebabe.ClassFile("Main")
+    val codeHandler = mainClass.addMainMethod.codeHandler
+
+    prog.main.vars.foreach(var_ => {
+      var_.getSymbol.compilerVariable = codeHandler.getFreshVar
+      generateCode(codeHandler, var_.expr)
+      codeHandler << storeVar(var_.getSymbol)
+    })
+
+    prog.main.exprs foreach { expr =>
+      generateCode(codeHandler, expr)
+      if (expr.getType != TUnit)
+        codeHandler << POP //remove value left on the stack
+    }
+
+    codeHandler.freeze
+    mainClass.writeToFile(outDir + "Main.class")
   }
 
 }
