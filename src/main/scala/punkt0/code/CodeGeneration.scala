@@ -191,6 +191,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           ch << ICONST_0
         case Identifier(value) =>
         case This() =>
+          ArgLoad(0)
         case Null() =>
           ch << ACONST_NULL
         case New(tpe) =>
