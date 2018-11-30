@@ -211,20 +211,28 @@ object CodeGeneration extends Phase[Program, Unit] {
         case If(cond, thn, els) =>
           val elseLabel = ch.getFreshLabel("elseLabel")
           val afterLabel = ch.getFreshLabel("afterLabel")
-          generateCode(ch, cond)
+          generateCode(ch, cond, className, localVars)
           ch << IfEq(elseLabel)
-          generateCode(ch, thn)
+          generateCode(ch, thn, className, localVars)
           els match {
             case Some(value) =>
               ch << Goto(afterLabel)
               ch << Label(elseLabel)
-              generateCode(ch, value)
+              generateCode(ch, value, className, localVars)
             case None =>
               ch << Label(elseLabel)
           }
           ch << Label(afterLabel)
 
         case While(cond, body) =>
+          val conditionLabel = ch.getFreshLabel("conditionLabel")
+          val afterLabel = ch.getFreshLabel("afterLabel")
+          ch << Label(conditionLabel)
+          generateCode(ch, cond, className, localVars)
+          ch << IfEq(afterLabel)
+          generateCode(ch, body, className, localVars)
+          ch << Goto(conditionLabel)
+          ch << Label(afterLabel)
 
         case Println(expr) =>
           ch << GetStatic("java/lang/System", "out", "Ljava/io/PrintStream;")
