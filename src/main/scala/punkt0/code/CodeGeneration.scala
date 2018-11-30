@@ -56,16 +56,12 @@ object CodeGeneration extends Phase[Program, Unit] {
     def generateMethodCode(ch: CodeHandler, mt: MethodDecl): Unit = {
       val methSym = mt.getSymbol
 
-      for (i <- mt.args.indices) {
-        mt.args(i).getSymbol.compilerVariable = i + 1
-        ch.getFreshVar
+      for (arg <- mt.args) {
+        arg.getSymbol.compilerVariable = ch.getFreshVar
       }
 
-      val offsetToVars = mt.args.length
-
-      for (i <- mt.vars.indices) {
-        mt.vars(i).getSymbol.compilerVariable = i + 1 + offsetToVars
-        ch.getFreshVar
+      for (_var <- mt.vars) {
+        _var.getSymbol.compilerVariable = ch.getFreshVar
       }
 
       mt.exprs.foreach(expr => generateCode(ch, expr))
@@ -74,9 +70,7 @@ object CodeGeneration extends Phase[Program, Unit] {
 
       // Return different bytecode depending on retExpr type
       mt.retType.getType match {
-        case TInt =>
-          ch << IRETURN
-        case TBoolean =>
+        case TInt | TBoolean =>
           ch << IRETURN
         case _ =>
           // All the rest should be class types
