@@ -58,7 +58,12 @@ object CodeGeneration extends Phase[Program, Unit] {
         mt.args(i).getSymbol.compilerVariable = i + 1
       }
 
-      mt.vars.foreach(_.getSymbol.compilerVariable = ch.getFreshVar)
+      mt.vars foreach { _var =>
+        _var.getSymbol.compilerVariable = ch.getFreshVar
+        generateCode(ch, _var.expr)
+        ch << storeVar(_var.getSymbol)
+      }
+
       mt.exprs.foreach(expr => generateCode(ch, expr))
 
       generateCode(ch, mt.retExpr)
