@@ -273,6 +273,17 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, expr)
           ch << InvokeVirtual("java/io/PrintStream", "println", s"(${expr.getType.compilerType})V")
         case Assign(id, expr) =>
+          generateCode(ch, expr)
+          ch << storeVar(id.getSymbol.asInstanceOf[VariableSymbol])
+      }
+    }
+
+    def storeVar(symbol: VariableSymbol): AbstractByteCodeGenerator = {
+      symbol.getType match {
+        case TClass(classSymbol) | TNull | TString =>
+          ALoad(symbol.compilerVariable)
+        case TInt | TBoolean =>
+          ILoad(symbol.compilerVariable)
       }
     }
 
