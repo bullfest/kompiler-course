@@ -156,6 +156,16 @@ object CodeGeneration extends Phase[Program, Unit] {
 
           generateCode(ch, lhs, className, localVars)
           generateCode(ch, rhs, className, localVars)
+          lhs.getType match {
+            case TNull | TString | TClass(classSymbol) =>
+              ch << If_ACmpEq(trueLabel)
+            case TInt | TBoolean =>
+              ch << If_ICmpEq(trueLabel)
+            case TUnit =>
+              // Comparing 2 Unit-values should always be true.
+              ch << ILOAD_1
+              return
+          }
           if (TNull.isSubTypeOf(lhs.getType)) //It's a object
             ch << If_ACmpEq(trueLabel)
           else
