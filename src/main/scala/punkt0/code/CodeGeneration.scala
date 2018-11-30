@@ -5,7 +5,7 @@ import cafebabe.AbstractByteCodes.{New => _, _}
 import cafebabe.ByteCodes._
 import cafebabe._
 import punkt0.analyzer.Symbols.{MethodSymbol, VariableSymbol}
-import punkt0.analyzer.Types
+import punkt0.analyzer.Types._
 import punkt0.ast.Trees._
 
 object CodeGeneration extends Phase[Program, Unit] {
