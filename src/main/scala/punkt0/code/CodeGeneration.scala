@@ -31,6 +31,15 @@ object CodeGeneration extends Phase[Program, Unit] {
       }
 
       val constructorCH = classFile.addConstructor().codeHandler
+      constructorCH <<
+        ALOAD_0
+      ct.parent match {
+        case Some(parent) =>
+          constructorCH << InvokeSpecial(parent.value, "<init>", "()V")
+        case None =>
+          constructorCH << InvokeSpecial("java/lang/Object", "<init>", "()V")
+      }
+
       ct.vars foreach {
         field =>
           generateCode(constructorCH, field.expr)
