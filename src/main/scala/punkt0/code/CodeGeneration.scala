@@ -195,10 +195,6 @@ object CodeGeneration extends Phase[Program, Unit] {
               return
             case _ => sys.error("This shouldn't happen")
           }
-          if (TNull.isSubTypeOf(lhs.getType)) //It's a object
-            ch << If_ACmpEq(trueLabel)
-          else
-            ch << If_ICmpEq(trueLabel)
 
           // False
           ch <<
