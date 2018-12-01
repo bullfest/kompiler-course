@@ -46,6 +46,9 @@ object CodeGeneration extends Phase[Program, Unit] {
             method.id.value,
             method.args.map(_.tpe.getType.compilerType)
           ).codeHandler
+          println()
+          println()
+          println(s"Generate ${method.id.value} ${method.getSymbol.getSignature}")
           generateMethodCode(codeHandler, method)
       }
 
@@ -83,7 +86,8 @@ object CodeGeneration extends Phase[Program, Unit] {
           // All the rest should be class types
           ch << ARETURN
       }
-
+      println(ch.paramTypes)
+      ch.print
       ch.freeze
     }
 
