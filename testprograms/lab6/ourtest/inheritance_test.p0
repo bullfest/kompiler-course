@@ -1,0 +1,17 @@
+class A extends B {
+  def foo():Int = {
+    x
+  }
+}
+
+class B extends C {}
+
+class C {
+  var x:Int = 2;
+}
+
+object Main extends App {
+  new C();
+  new B();
+  println((new A()).foo())
+}
