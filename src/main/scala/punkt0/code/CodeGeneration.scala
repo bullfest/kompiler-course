@@ -26,8 +26,6 @@ object CodeGeneration extends Phase[Program, Unit] {
       ct.vars foreach {
         field =>
           classFile.addField(field.tpe.getType.compilerType, field.id.value)
-          field.getSymbol.className = className
-          field.getSymbol.isField = true
       }
 
       val constructorCH = classFile.addConstructor().codeHandler
@@ -43,7 +41,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       ct.vars foreach {
         field =>
           generateCode(constructorCH, field.expr)
-          constructorCH << ALOAD_0 << PutField(className, field.id.value, field.tpe.getType.compilerType)
+          storeVar(constructorCH, field.getSymbol)
       }
       constructorCH << RETURN
       constructorCH.freeze
@@ -74,7 +72,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       mt.vars foreach { _var =>
         _var.getSymbol.compilerVariable = ch.getFreshVar
         generateCode(ch, _var.expr)
-        ch << storeVar(_var.getSymbol)
+        storeVar(ch, _var.getSymbol)
       }
 
       mt.exprs.foreach(expr => {
@@ -239,7 +237,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           ch << ICONST_0
         case ident: Identifier =>
           val symbol = ident.getSymbol.asInstanceOf[VariableSymbol]
-          if (symbol.isField) {
+          if (symbol.compilerVariable == -1) {
             //It's a field
             ch << ALOAD_0 << GetField(symbol.className, ident.value, ident.getType.compilerType)
           } else {
@@ -310,17 +308,21 @@ object CodeGeneration extends Phase[Program, Unit] {
           ch << InvokeVirtual("java/io/PrintStream", "println", s"(${expr.getType.compilerType})V")
         case Assign(id, expr) =>
           generateCode(ch, expr)
-          ch << storeVar(id.getSymbol.asInstanceOf[VariableSymbol])
+          storeVar(ch, id.getSymbol.asInstanceOf[VariableSymbol])
       }
     }
 
-    def storeVar(symbol: VariableSymbol): AbstractByteCodeGenerator = {
-      symbol.getType match {
-        case _: TClass | TNull | TString =>
-          AStore(symbol.compilerVariable)
-        case TInt | TBoolean =>
-          IStore(symbol.compilerVariable)
-        case _ => sys.error("This shouldn't happen")
+    def storeVar(ch: CodeHandler, symbol: VariableSymbol): Unit = {
+      if (symbol.compilerVariable == -1) {
+        ch << ALOAD_0 << PutField(symbol.className, symbol.name, symbol.getType.compilerType)
+      } else {
+        symbol.getType match {
+          case _: TClass | TNull | TString =>
+            ch << AStore(symbol.compilerVariable)
+          case TInt | TBoolean =>
+            ch << IStore(symbol.compilerVariable)
+          case _ => sys.error("This shouldn't happen")
+        }
       }
     }
 
@@ -346,7 +348,7 @@ object CodeGeneration extends Phase[Program, Unit] {
     prog.main.vars.foreach(var_ => {
       var_.getSymbol.compilerVariable = codeHandler.getFreshVar
       generateCode(codeHandler, var_.expr)
-      codeHandler << storeVar(var_.getSymbol)
+      storeVar(codeHandler, var_.getSymbol)
     })
 
     prog.main.exprs foreach { expr =>

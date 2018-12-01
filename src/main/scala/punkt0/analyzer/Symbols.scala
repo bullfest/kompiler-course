@@ -114,7 +114,6 @@ object Symbols {
   }
 
   class VariableSymbol(val name: String) extends Symbol {
-    var isField: Boolean = false
     var className: String = ""
     var compilerVariable: Int = -1
   }

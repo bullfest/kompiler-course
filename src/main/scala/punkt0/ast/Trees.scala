@@ -223,6 +223,7 @@ object Trees {
           }
         case None =>
       }
+      vars.foreach(_.getSymbol.className = id.value)
     }
 
     override def attachSymbols(gs: GlobalScope, classScope: ClassSymbol, methodScope: MethodSymbol): Unit = {
