@@ -237,7 +237,7 @@ object CodeGeneration extends Phase[Program, Unit] {
               ch << ALoad(symbol.compilerVariable)
           }
         case This() =>
-          ArgLoad(0)
+          ch << ArgLoad(0)
         case Null() =>
           ch << ACONST_NULL
         case New(tpe) =>
