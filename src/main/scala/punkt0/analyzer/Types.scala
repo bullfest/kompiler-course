@@ -48,7 +48,7 @@ object Types {
 
     override def toString: String = classSymbol.name
 
-    override val compilerType: String = "L" + classSymbol.name
+    override val compilerType: String = "L" + classSymbol.name + ";"
   }
 
   case object TError extends Type {
@@ -97,7 +97,7 @@ object Types {
 
     override def toString: String = "String"
 
-    override val compilerType: String = "Ljava/lang/String"
+    override val compilerType: String = "Ljava/lang/String;"
   }
 
   case object TUnit extends Type {
