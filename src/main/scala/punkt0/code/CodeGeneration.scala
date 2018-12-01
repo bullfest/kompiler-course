@@ -102,12 +102,12 @@ object CodeGeneration extends Phase[Program, Unit] {
 
           // True
           ch <<
-            ILOAD_1 <<
+            ICONST_1 <<
             Goto(afterLabel)
           // False
           ch <<
             Label(falseLabel) <<
-            ILOAD_0
+            ICONST_0
 
           ch <<
             Label(afterLabel)
@@ -124,12 +124,12 @@ object CodeGeneration extends Phase[Program, Unit] {
 
           // False
           ch <<
-            ILOAD_0 <<
+            ICONST_0 <<
             Goto(afterLabel)
           // True
           ch <<
             Label(trueLabel) <<
-            ILOAD_1
+            ICONST_1
 
           ch <<
             Label(afterLabel)
@@ -168,12 +168,12 @@ object CodeGeneration extends Phase[Program, Unit] {
 
           // False
           ch <<
-            ILOAD_0 <<
+            ICONST_0 <<
             Goto(afterLabel)
           // True
           ch <<
             Label(trueLabel) <<
-            ILOAD_1
+            ICONST_1
 
           ch <<
             Label(afterLabel)
@@ -191,7 +191,7 @@ object CodeGeneration extends Phase[Program, Unit] {
               ch << If_ICmpEq(trueLabel)
             case TUnit =>
               // Comparing 2 Unit-values should always be true.
-              ch << ILOAD_1
+              ch << ICONST_1
               return
             case _ => sys.error("This shouldn't happen")
           }
@@ -202,12 +202,12 @@ object CodeGeneration extends Phase[Program, Unit] {
 
           // False
           ch <<
-            ILOAD_0 <<
+            ICONST_0 <<
             Goto(afterLabel)
           // True
           ch <<
             Label(trueLabel) <<
-            ILOAD_1
+            ICONST_1
 
           ch <<
             Label(afterLabel)
@@ -252,11 +252,11 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, expr)
           ch << IfEq(trueLabel)
           ch <<
-            ILOAD_0 <<
+            ICONST_0 <<
             Goto(afterLabel)
           ch <<
             Label(trueLabel) <<
-            ILOAD_1
+            ICONST_1
           ch <<
             Label(afterLabel)
 
