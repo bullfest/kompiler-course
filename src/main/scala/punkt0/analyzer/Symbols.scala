@@ -107,7 +107,7 @@ object Symbols {
 
     def getSignature: String = {
       "(" +
-        params.mapValues(_.getType.compilerType).mkString("") +
+        params.mapValues(_.getType.compilerType).values.mkString("") +
         ")" +
         getType.compilerType
     }
