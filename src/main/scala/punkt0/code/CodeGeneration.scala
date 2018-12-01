@@ -65,7 +65,11 @@ object CodeGeneration extends Phase[Program, Unit] {
         ch << storeVar(_var.getSymbol)
       }
 
-      mt.exprs.foreach(expr => generateCode(ch, expr))
+      mt.exprs.foreach(expr => {
+        generateCode(ch, expr)
+        if (expr.getType != TUnit)
+          ch << POP
+      })
 
       generateCode(ch, mt.retExpr)
 
