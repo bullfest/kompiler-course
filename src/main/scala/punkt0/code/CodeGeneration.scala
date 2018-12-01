@@ -43,7 +43,7 @@ object CodeGeneration extends Phase[Program, Unit] {
       ct.vars foreach {
         field =>
           generateCode(constructorCH, field.expr)
-          constructorCH << PutField(className, field.id.value, field.tpe.getType.compilerType)
+          constructorCH << ALOAD_0 << PutField(className, field.id.value, field.tpe.getType.compilerType)
       }
       constructorCH << RETURN
       constructorCH.freeze
@@ -241,7 +241,7 @@ object CodeGeneration extends Phase[Program, Unit] {
           val symbol = ident.getSymbol.asInstanceOf[VariableSymbol]
           if (symbol.isField) {
             //It's a field
-            ch << GetField(symbol.className, ident.value, ident.getType.compilerType)
+            ch << ALOAD_0 << GetField(symbol.className, ident.value, ident.getType.compilerType)
           } else {
             //It's a local variable or a parameter
             if (ident.getType.eq(TBoolean) || ident.getType.eq(TInt))
