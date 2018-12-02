@@ -40,8 +40,7 @@ object CodeGeneration extends Phase[Program, Unit] {
 
       ct.vars foreach {
         field =>
-          generateCode(constructorCH, field.expr)
-          storeVar(constructorCH, field.getSymbol)
+          storeVar(constructorCH, field.expr, field.getSymbol)
       }
       constructorCH << RETURN
       constructorCH.freeze
@@ -71,8 +70,7 @@ object CodeGeneration extends Phase[Program, Unit] {
 
       mt.vars foreach { _var =>
         _var.getSymbol.compilerVariable = ch.getFreshVar
-        generateCode(ch, _var.expr)
-        storeVar(ch, _var.getSymbol)
+        storeVar(ch, _var.expr, _var.getSymbol)
       }
 
       mt.exprs.foreach(expr => {
@@ -307,15 +305,17 @@ object CodeGeneration extends Phase[Program, Unit] {
           generateCode(ch, expr)
           ch << InvokeVirtual("java/io/PrintStream", "println", s"(${expr.getType.compilerType})V")
         case Assign(id, expr) =>
-          generateCode(ch, expr)
-          storeVar(ch, id.getSymbol.asInstanceOf[VariableSymbol])
+          storeVar(ch, expr, id.getSymbol.asInstanceOf[VariableSymbol])
       }
     }
 
-    def storeVar(ch: CodeHandler, symbol: VariableSymbol): Unit = {
+    def storeVar(ch: CodeHandler, expr: ExprTree, symbol: VariableSymbol): Unit = {
       if (symbol.compilerVariable == -1) {
-        ch << ALOAD_0 << PutField(symbol.className, symbol.name, symbol.getType.compilerType)
+        ch << ALOAD_0
+        generateCode(ch, expr)
+        ch << PutField(symbol.className, symbol.name, symbol.getType.compilerType)
       } else {
+        generateCode(ch, expr)
         symbol.getType match {
           case _: TClass | TNull | TString =>
             ch << AStore(symbol.compilerVariable)
@@ -347,8 +347,7 @@ object CodeGeneration extends Phase[Program, Unit] {
 
     prog.main.vars.foreach(var_ => {
       var_.getSymbol.compilerVariable = codeHandler.getFreshVar
-      generateCode(codeHandler, var_.expr)
-      storeVar(codeHandler, var_.getSymbol)
+      storeVar(codeHandler, var_.expr, var_.getSymbol)
     })
 
     prog.main.exprs foreach { expr =>
